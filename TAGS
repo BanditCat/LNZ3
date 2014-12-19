@@ -1,0 +1,95 @@
+
+lmat.h,291
+#define LMAT_H7,280
+typedef GLfloat lmat[lmat9,296
+typedef GLfloat lvec[lvec10,324
+void lmidentity(12,352
+void lmscale(13,377
+void lmbasis(14,411
+void lmmult(15,466
+void lmprojection(16,499
+void lmtranslate(17,533
+void lvcross(19,566
+float lvdot(20,600
+void lvnormalize(21,639
+
+lnz.h,879
+#define LNZ_H4,35
+#define GLEW_STATIC7,67
+typedef unsigned char u8;11,116
+typedef unsigned short int u16;12,142
+typedef unsigned int u32;13,174
+typedef unsigned long long int u64;14,200
+typedef signed char s8;15,236
+typedef signed short int s16;16,260
+typedef signed int s32;17,290
+typedef signed long long int s64;18,314
+typedef float f32;19,348
+typedef double f64;20,367
+#define pi 54,1707
+SDL_DisplayMode fullscreenDM;57,1807
+SDL_Window* mainWindow;59,1857
+SDL_GLContext glContext;61,1904
+void LNZInit(64,1954
+void LNZReinit(67,2090
+void LNZOSReinit(70,2218
+void LNZQuit(72,2245
+void LNZLoop(75,2292
+void LNZSetKeyHandler(78,2384
+void LNZSetTouchHandler(79,2438
+void LNZSetMouseHandler(80,2494
+void LNZSetWindowHandler(81,2550
+u8* LNZLoadResource(86,2828
+u8* LNZLoadResourceOrDie(87,2880
+GLuint LNZCompileOrDie(90,2985
+GLuint LNZLinkOrDie(92,3093
+
+lmat.c,208
+void lmidentity(7,262
+void lmscale(17,429
+void lmbasis(30,697
+void lmprojection(46,1198
+void lmtranslate(61,1530
+void lmmult(74,1796
+void lvcross(87,2092
+void lvnormalize(93,2309
+float lvdot(98,2422
+
+lnz.c,386
+SDL_DisplayMode fullscreenDM 9,365
+SDL_Window* mainWindow 11,423
+SDL_GLContext glContext 13,477
+void LNZQuit(22,720
+void LNZInit(30,888
+void LNZReinit(60,1835
+void LNZLoop(132,4143
+void LNZSetKeyHandler(156,4999
+void LNZSetTouchHandler(159,5080
+void LNZSetMouseHandler(162,5165
+void LNZSetWindowHandler(165,5250
+GLuint LNZCompileOrDie(169,5340
+GLuint LNZLinkOrDie(198,6149
+
+main.c,348
+#define PARTICLE_GROUPS 10,320
+#define PARTICLE_COUNT 11,349
+int dwidth,13,400
+int dwidth, dheight;13,400
+float sfps 14,421
+float rotx 15,440
+int rel 16,510
+int blowup 17,523
+float scale 18,539
+lvec trns 19,556
+u64 disableMouseTime 20,582
+void keys(22,609
+void touches(46,1296
+void wms(105,3190
+void mice(112,3386
+int main(132,4013
+
+os.c,122
+#define WIN32_LEAN_AND_MEAN6,284
+void LNZOSReinit(16,527
+u8* LNZLoadResource(30,1025
+u8* LNZLoadResourceOrDie(47,1469

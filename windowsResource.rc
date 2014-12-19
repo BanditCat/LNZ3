@@ -1,0 +1,37 @@
+////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) Jonathan(Jon) DuBois 2014. This file is part of LNZ.         //
+////////////////////////////////////////////////////////////////////////////////
+
+101 ICON "bcj.ico"
+
+init.glsl RCDATA "init.glsl"
+main.glsl RCDATA "main.glsl"
+
+gbuffer.frag RCDATA "gbuffer.frag"
+
+gbuffer.vert RCDATA "gbuffer.vert"
+
+1 VERSIONINFO
+FILEVERSION     0,0,0,1
+PRODUCTVERSION  0,0,0,1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Jon DuBois"
+      VALUE "FileDescription", "LNZ"
+      VALUE "FileVersion", "3.1a"
+      VALUE "InternalName", "LNZ3.1a"
+      VALUE "LegalCopyright", "Copyright Jonathan(Jon) DuBois"
+      VALUE "OriginalFilename", "lnz.exe"
+      VALUE "ProductName", "LNZ"
+      VALUE "ProductVersion", "3.1a"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
