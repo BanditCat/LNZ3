@@ -1,59 +1,65 @@
 
-lmat.h,291
-#define LMAT_H7,280
-typedef GLfloat lmat[lmat9,296
-typedef GLfloat lvec[lvec10,324
-void lmidentity(12,352
-void lmscale(13,377
-void lmbasis(14,411
-void lmmult(15,466
-void lmprojection(16,499
-void lmtranslate(17,533
-void lvcross(19,566
-float lvdot(20,600
-void lvnormalize(21,639
+lmat.h,365
+#define LMAT_H8,281
+typedef GLfloat lmat[lmat10,297
+typedef GLfloat lvec[lvec11,325
+void lmidentity(13,353
+void lmcopy(14,378
+void lmscale(15,419
+void lmbasis(16,453
+void lmmult(17,508
+void lmprojection(18,541
+void lmtranslate(19,575
+void lmtranspose(20,607
+float lmdeterminate(23,658
+void lvcross(25,701
+float lvdot(26,735
+void lvnormalize(27,774
 
-lnz.h,879
-#define LNZ_H4,35
-#define GLEW_STATIC7,67
-typedef unsigned char u8;11,116
-typedef unsigned short int u16;12,142
-typedef unsigned int u32;13,174
-typedef unsigned long long int u64;14,200
-typedef signed char s8;15,236
-typedef signed short int s16;16,260
-typedef signed int s32;17,290
-typedef signed long long int s64;18,314
-typedef float f32;19,348
-typedef double f64;20,367
-#define pi 54,1707
-SDL_DisplayMode fullscreenDM;57,1807
-SDL_Window* mainWindow;59,1857
-SDL_GLContext glContext;61,1904
-void LNZInit(64,1954
-void LNZReinit(67,2090
-void LNZOSReinit(70,2218
-void LNZQuit(72,2245
-void LNZLoop(75,2292
-void LNZSetKeyHandler(78,2384
-void LNZSetTouchHandler(79,2438
-void LNZSetMouseHandler(80,2494
-void LNZSetWindowHandler(81,2550
-u8* LNZLoadResource(86,2828
-u8* LNZLoadResourceOrDie(87,2880
-GLuint LNZCompileOrDie(90,2985
-GLuint LNZLinkOrDie(92,3093
+lnz.h,882
+#define LNZ_H8,279
+#define GLEW_STATIC12,312
+typedef unsigned char u8;17,381
+typedef unsigned short int u16;18,407
+typedef unsigned int u32;19,439
+typedef unsigned long long int u64;20,465
+typedef signed char s8;21,501
+typedef signed short int s16;22,525
+typedef signed int s32;23,555
+typedef signed long long int s64;24,579
+typedef float f32;25,613
+typedef double f64;26,632
+#define pi 57,1728
+SDL_DisplayMode fullscreenDM;60,1889
+SDL_Window* mainWindow;62,1939
+SDL_GLContext glContext;64,1986
+void LNZInit(67,2036
+void LNZReinit(70,2172
+void LNZOSReinit(73,2300
+void LNZQuit(75,2327
+void LNZLoop(78,2374
+void LNZSetKeyHandler(81,2466
+void LNZSetTouchHandler(82,2520
+void LNZSetMouseHandler(83,2576
+void LNZSetWindowHandler(84,2632
+u8* LNZLoadResource(89,2910
+u8* LNZLoadResourceOrDie(90,2962
+GLuint LNZCompileOrDie(93,3067
+GLuint LNZLinkOrDie(95,3175
 
-lmat.c,208
+lmat.c,287
 void lmidentity(7,262
-void lmscale(17,429
-void lmbasis(30,697
-void lmprojection(46,1198
-void lmtranslate(61,1530
-void lmmult(74,1796
-void lvcross(87,2092
-void lvnormalize(93,2309
-float lvdot(98,2422
+void lmcopy(15,427
+void lmscale(19,527
+void lmbasis(32,795
+void lmprojection(48,1296
+void lmtranslate(63,1628
+void lmmult(76,1894
+float lmdeterminate(88,2189
+void lmtranspose(111,2673
+void lvcross(118,2838
+void lvnormalize(124,3055
+float lvdot(129,3168
 
 lnz.c,386
 SDL_DisplayMode fullscreenDM 9,365
@@ -62,34 +68,40 @@ SDL_GLContext glContext 13,477
 void LNZQuit(22,720
 void LNZInit(30,888
 void LNZReinit(60,1835
-void LNZLoop(132,4143
-void LNZSetKeyHandler(156,4999
-void LNZSetTouchHandler(159,5080
-void LNZSetMouseHandler(162,5165
-void LNZSetWindowHandler(165,5250
-GLuint LNZCompileOrDie(169,5340
-GLuint LNZLinkOrDie(198,6149
+void LNZLoop(133,4178
+void LNZSetKeyHandler(157,5034
+void LNZSetTouchHandler(160,5115
+void LNZSetMouseHandler(163,5200
+void LNZSetWindowHandler(166,5285
+GLuint LNZCompileOrDie(170,5375
+GLuint LNZLinkOrDie(199,6184
 
-main.c,348
+main.c,508
 #define PARTICLE_GROUPS 10,320
-#define PARTICLE_COUNT 11,349
-int dwidth,13,400
-int dwidth, dheight;13,400
-float sfps 14,421
-float rotx 15,440
-int rel 16,510
-int blowup 17,523
-float scale 18,539
-lvec trns 19,556
-u64 disableMouseTime 20,582
-void keys(22,609
-void touches(46,1296
-void wms(105,3190
-void mice(112,3386
-int main(132,4013
+#define PARTICLE_COUNT 11,347
+#define GBUFFER_WIDTH 13,398
+#define GBUFFER_HEIGHT 14,439
+#define GBUFFER_SIZE 15,481
+int movingWindow 18,539
+int fullscreen 19,561
+int dwidth,20,581
+int dwidth, dheight;20,581
+int pixelSize 21,602
+float sfps 22,621
+float rotx 23,640
+int rel 24,688
+int blowup 25,701
+float scale 26,717
+lvec trns 27,734
+u64 disableMouseTime 28,760
+void keys(30,787
+void touches(79,2362
+void wms(147,4506
+void mice(154,4702
+int main(209,6201
 
-os.c,122
+os.c,120
 #define WIN32_LEAN_AND_MEAN6,284
-void LNZOSReinit(16,527
-u8* LNZLoadResource(30,1025
-u8* LNZLoadResourceOrDie(47,1469
+void LNZOSReinit(15,429
+u8* LNZLoadResource(18,490
+u8* LNZLoadResourceOrDie(35,934

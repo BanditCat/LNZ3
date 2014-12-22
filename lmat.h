@@ -11,11 +11,15 @@ typedef GLfloat lmat[ 16 ];
 typedef GLfloat lvec[ 3 ];
 
 void lmidentity( lmat );
+void lmcopy( lmat dst, const lmat src );
 void lmscale( lmat, const lvec );
 void lmbasis( lmat, const lvec up, const lvec right );
 void lmmult( lmat, const lmat );
 void lmprojection( lmat, float );
 void lmtranslate( lmat, lvec );
+void lmtranspose( lmat );
+void lminvert( lmat );
+void lmlogMatrix( const lmat m );
 
 void lvcross( lvec, const lvec );
 float lvdot( const lvec, const lvec );

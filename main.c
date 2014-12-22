@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "math.h"
 
-#define PARTICLE_GROUPS 256
+#define PARTICLE_GROUPS 64
 #define PARTICLE_COUNT ( 1024 * PARTICLE_GROUPS )
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
@@ -221,6 +221,8 @@ int main( int argc, char* argv[] ){
   LNZSetMouseHandler( mice );
   LNZSetWindowHandler( wms );
 
+		
+
   u64 sz;
   GLuint shd[ 2 ];
   u8* dt = LNZLoadResourceOrDie( "main.glsl", &sz );
@@ -315,6 +317,7 @@ int main( int argc, char* argv[] ){
   u64 ntime = SDL_GetPerformanceCounter();
   GLuint dtloc = glGetUniformLocation( prg, "dt" );
   GLuint smvploc = glGetUniformLocation( prg, "mvp" );
+  GLuint rmvloc = glGetUniformLocation( bprg, "rmv" );
   GLuint bscreenloc = glGetUniformLocation( bprg, "screen" );
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
   GLuint gcountloc = glGetUniformLocation( iprg, "gcount" );
@@ -365,7 +368,7 @@ int main( int argc, char* argv[] ){
     rotx += udtime * drotx * 2;
     roty += udtime * droty * 2;
     
-    lmat mvp;    
+    lmat mvp, mv, rmv, proj;    
     {
       float aspect = sqrt( dwidth / (double)dheight );
       lvec sc = { 0.013 / aspect, 0.013 * aspect, 0.13 };
@@ -374,11 +377,17 @@ int main( int argc, char* argv[] ){
 		  sinf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ) };
       lvec right = { cosf( rotx * 5 ), 0.0, sinf( rotx * 5 ) };
 
-      lmidentity( mvp );
-      lmbasis( mvp, up, right );
-      lmtranslate( mvp, trns );
-      lmprojection( mvp, 0.0125 );
-      lmscale( mvp, sc );
+      lmidentity( mv );
+      lmbasis( mv, up, right );
+      lmtranslate( mv, trns );
+      lmcopy( rmv, mv );
+      lminvert( rmv );
+      lmidentity( proj );
+      lmprojection( proj, 0.0125 );
+      lmscale( proj, sc );
+      lmcopy( mvp, mv );
+      lmmult( mvp, proj );
+
     } 
 
     // Clear gbuffer. glClearBufferData is unreliable.
@@ -416,6 +425,8 @@ int main( int argc, char* argv[] ){
     // Render quad.
     glUseProgram( bprg );
     glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, pixelSize, 0);
+    glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
+
     glBindVertexArray( screenQuadVao );
     glBindImageTexture( 4, texs[ 4 + bsel / 2 ], 0, GL_FALSE, 0, 
 			GL_READ_WRITE, GL_R32UI );

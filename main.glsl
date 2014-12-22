@@ -34,7 +34,7 @@ void main( void ){
   pos.w -= 0.004 * dt;
 
   // Loop for hi res
-  float m = 1;
+  float m = 2;
   for( c = 0; c < int( m ); ++c ){
     for( i = 0; i < 64; i++ ){ 
       vec3 dist = ( attractor[ i ].xyz - pos.xyz ) * 0.7; 
@@ -137,3 +137,4 @@ void main( void ){
   }
 }
 
+ 

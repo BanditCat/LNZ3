@@ -8,6 +8,7 @@ layout( location = 0 ) out vec4 color;
 layout( r32ui, binding = 4 ) coherent uniform uimageBuffer gbuffer;
 
 uniform vec4 screen;
+uniform mat4 rmv;
 
 void main(void) { 
   vec4 ans;
@@ -62,6 +63,12 @@ void main(void) {
     ans.r = ans.g = ans.b = 1;
   }
   ans.a = 1;
+
+
+  // raytracing
+  vec4 origin = { 0, 0, 0, 1 };
+  vec4 screenVector = 
+
 
   color = ans;
 }
