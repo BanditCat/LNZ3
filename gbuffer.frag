@@ -80,7 +80,7 @@ void main(void) {
 			( ray.y - origin.y ) * t + origin.y,
 			( ray.z - origin.z ) * t + origin.z };  
 
-  if( abs( intersection.z ) < 30.0 ){
+  if( abs( intersection.z ) < 30.0 `&& abs( intersection.y ) < 30.0 ){
     color.r = 0;
     color.g = 1;
     color.b = 0.5;
