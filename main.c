@@ -369,8 +369,8 @@ int main( int argc, char* argv[] ){
     roty += udtime * droty * 2;
     
     lmat mvp, mv, rmv, proj;    
+    float aspect = sqrt( dwidth / (double)dheight );
     {
-      float aspect = sqrt( dwidth / (double)dheight );
       lvec sc = { 0.013 / aspect, 0.013 * aspect, 0.13 };
       lvec up = { cosf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ), 
 		  cosf( roty * 5 ), 
@@ -424,7 +424,7 @@ int main( int argc, char* argv[] ){
       
     // Render quad.
     glUseProgram( bprg );
-    glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, pixelSize, 0);
+    glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, pixelSize, aspect );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
 
     glBindVertexArray( screenQuadVao );

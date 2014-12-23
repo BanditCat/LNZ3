@@ -65,11 +65,25 @@ void main(void) {
   ans.a = 1;
 
 
-  // raytracing
+  // raytracing a disk on the plane x = 0. rmv is the inverse model view matrix.
   vec4 origin = { 0, 0, 0, 1 };
-  vec4 screenVector = 
+  vec4 ray = { ( ( gl_FragCoord.x / ( screen.x * screen.z ) ) * 2.0 - 1.0 ) * screen.w,  
+	       ( ( gl_FragCoord.y / ( screen.y * screen.z ) ) * 2.0 - 1.0 ) / screen.w,  
+	       1.0,
+	       1.0 };
+  origin = origin * rmv;
+  ray = ray * rmv;
+  //(x2 - x1)t + x1 = x
+  //t = x1 / (x1 - x2);
+  t = origin.x / (origin.x - ray.x);
+  vec3 intersection = { 0, 
+			( ray.y - origin.y ) * t + origin.y,
+			( ray.z - origin.z ) * t + origin.z };  
 
-
-  color = ans;
+  if( abs( intersection.z ) < 30.0 ){
+    color.r = 0;
+    color.g = 1;
+    color.b = 0.5;
+  } else
+    color = ans;
 }
-
