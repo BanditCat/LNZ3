@@ -73,14 +73,16 @@ void main(void) {
 	       1.0 };
   origin = origin * rmv;
   ray = ray * rmv;
-  //(x2 - x1)t + x1 = x
-  //t = x1 / (x1 - x2);
-  t = origin.x / (origin.x - ray.x);
-  vec3 intersection = { 0, 
+  //(x2 - x1)t + x1 = c
+  //t = (c - x1) / (x2 - x1);
+  t = ( 50.0 - origin.x ) / ( ray.x - origin.x );
+  vec3 xaxis = { 1, 0, 0 };
+  vec3 intersection = { 50.0, 
 			( ray.y - origin.y ) * t + origin.y,
 			( ray.z - origin.z ) * t + origin.z };  
 
-  if( abs( intersection.z ) < 30.0 `&& abs( intersection.y ) < 30.0 ){
+  if( abs( intersection.z ) < 30.0 && abs( intersection.y ) < 30.0  &&
+      dot( ray.xyz, xaxis ) > 0.0 ){
     color.r = 0;
     color.g = 1;
     color.b = 0.5;
