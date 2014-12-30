@@ -15,7 +15,7 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 256
+#define OCTREE_SIZE 20000000
 // 10 uints, normal, color, and 8 kids.
 #define OCTREE_NODE_SIZE 40
 
@@ -284,7 +284,7 @@ int main( int argc, char* argv[] ){
   
   double time = rand();
   u64 ntime = SDL_GetPerformanceCounter();
-  GLuint rmvloc = glGetUniformLocation( bprg, "rmv" );
+  GLuint rmvloc = glGetUniformLocation( prg, "rmv" );
   GLuint bscreenloc = glGetUniformLocation( bprg, "screen" );
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
   GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
@@ -339,10 +339,13 @@ int main( int argc, char* argv[] ){
     glUseProgram( prg );
     glBindImageTexture( 0, texs[ nbsel ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
+    //    glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0,
+    //			GL_READ_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
 		 pixelSize, aspect );
+    glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
     
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
 		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
@@ -350,7 +353,6 @@ int main( int argc, char* argv[] ){
     // Render quad.
     glUseProgram( bprg );
     glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, pixelSize, aspect );
-    glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
    
     glBindVertexArray( screenQuadVao );
     glBindImageTexture( 4, texs[ bsel ], 0, GL_FALSE, 0, 
