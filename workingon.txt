@@ -1,1 +1,1 @@
-LNZ3.1a Octrees! Controllable particle count, movable windows, fat pixels, text.
+LNZ3.1a Octrees! Ditheringss, fat pixels, text.

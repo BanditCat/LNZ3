@@ -5,15 +5,17 @@
 #version 430 core
 layout( location = 0 ) out vec4 color;
 
-layout( r32ui, binding = 4 ) coherent uniform uimageBuffer gbuffer;
+layout( r32ui, binding = 4 ) uniform uimageBuffer gbuffer;
 
 uniform vec4 screen;
 uniform mat4 rmv;
 
 
 
-bool raycastCube( inout vec4 origin, in vec4 ray, in vec3 cubeCenter, 
-		  in float cubeRadius, out vec3 ans );
+float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
+		   in float cubeRadius );
+float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
+		     in vec3 cubeCenter, in float cubeRadius );
 
 
 void main(void) { 
@@ -69,83 +71,80 @@ void main(void) {
     ans.r = ans.g = ans.b = 1;
   }
 
-  vec4 origin = { 0, 0, 0, 1 };
-  vec4 ray = { ( ( gl_FragCoord.x / ( screen.x * screen.z ) ) * 2.0 - 1.0 ) * screen.w,  
+  vec3 origin = { 0, 0, 0 };
+  vec3 ray = { ( ( gl_FragCoord.x / ( screen.x * screen.z ) ) * 2.0 - 1.0 ) * screen.w,  
 	       ( ( gl_FragCoord.y / ( screen.y * screen.z ) ) * 2.0 - 1.0 ) / screen.w,  
-	       1.0,
-	       1.0 };
+	       1.125 };
   
-  vec3 cubeCenter = { 50, -50, 10 };
-  float cubeRadius = 16.0;
+  vec3 cubeCenter = { 0.0, 0.0, 0.0 };
+  float cubeRadius = 10;
 
-  origin = origin * rmv;
-  ray = ray * rmv;
+  origin = ( vec4( origin, 1 ) * rmv ).xyz;
+  ray = normalize( ( vec4( ray, 1 ) * rmv ).xyz - origin );
   vec3 col;
-  if( raycastCube( origin, ray, cubeCenter, cubeRadius, col ) )
-    color.xyz = col;
-  else
-    color.xyz = ans;
+  uint i;
+  for( i = 0;  i < 16; ++i ){
+    float t = raycastOctree( origin, ray, gbuffer, cubeCenter, cubeRadius );
+    if( t != 0.0 )
+      color.xyz = vec3( 0.0, 1.0, 0.5 ) * vec3( t / 10 );
+    else
+      color.xyz = ans;
+  }
+  
 
 }
 
-bool raycastCube( inout vec4 origin, in vec4 ray, in vec3 cubeCenter, 
-		  in float cubeRadius, out vec3 ans ){
+float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
+		  in float cubeRadius ){
   
-  vec3 axis = { 0, 0, 0 };
-  float t;
-  //(x2 - x1)t + x1 = c
-  //t = (c - x1) / (x2 - x1);
-  ans = vec3( 0 );
-  if( origin.x < cubeCenter.x - cubeRadius )
-    axis.x = cubeCenter.x - cubeRadius;
-  else if( origin.x > cubeCenter.x + cubeRadius )
-    axis.x = cubeCenter.x + cubeRadius;
-  if( axis.x != 0.0 ){
-    t = ( axis.x - origin.x ) / ( ray.x - origin.x );
-    vec3 intersection = { axis.x, 
-			  ( ray.y - origin.y ) * t + origin.y,
-			  ( ray.z - origin.z ) * t + origin.z };  
-    
-    if( abs( intersection.z - cubeCenter.z ) < cubeRadius && 
-	abs( intersection.y - cubeCenter.y ) < cubeRadius ){
-      ans.r = 0;
-      ans.g = 1;
-      ans.b = 1;
+  vec3 axisOut = cubeCenter + sign( ray ) * vec3( cubeRadius );
+  vec3 axisIn = cubeCenter - sign( ray ) * vec3( cubeRadius );
+  vec3 t = ( axisOut - origin ) / ray;
+  float tOut = min( min( t.x, t.y ), t.z );
+  t = ( axisIn - origin ) / ray;
+  float tIn = max( max( t.x, t.y ), t.z );
+  
+  if( tIn <= tOut )
+    if( tIn > 0.0 )
+      return tIn;
+    else if( tOut > 0.0 )
+      return tOut;
+  return 0.0;
+}
+
+uniform uint octreeSize = 10;
+uniform uint octreeNormal = 0;
+uniform uint octreeColor = 1;
+uniform uint octreeChildren = 2;
+
+
+float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
+		     in vec3 cubeCenter, in float cubeRadius ){
+  uint top = 0;
+  uint nodes[ 128 ];
+  vec3 centers[ 128 ];
+  float radii[ 128 ];
+  float tvalues[ 128 ];
+  
+  tvalues[ 0 ] = raycastCube( origin, ray, cubeCenter, cubeRadius );
+  if( tvalues[ 0 ] <= 0.0 )
+    return 0.0;
+ 
+  return tvalues[ 0 ];
+ 
+  nodes[ 0 ] = 0;
+  centers[ 0 ] = cubeCenter;
+  radii[ 0 ] = cubeRadius;
+
+  for( uint c = 0; c < 16; ++c ){
+    for( uint i = 0; i < 8; ++i ){
+ 
+    vec3 newCenter = { ( ( i >> 0 ) & 1 ) * 2.0 - 1.0,
+		  ( ( i >> 1 ) & 1 ) * 2.0 - 1.0,
+		  ( ( i >> 2 ) & 1 ) * 2.0 - 1.0 };
+    float newRadius = cubeRadius / 2.0;
+    newCenter = newRadius * newCenter + cubeCenter;
+	  
     }
   }
-  if( origin.y < cubeCenter.y - cubeRadius )
-    axis.y = cubeCenter.y - cubeRadius;
-  else if( origin.y > cubeCenter.y + cubeRadius )
-    axis.y = cubeCenter.y + cubeRadius;
-  if( axis.y != 0.0 ){
-    t = ( axis.y - origin.y ) / ( ray.y - origin.y );
-    vec3 intersection = { ( ray.x - origin.x ) * t + origin.x,
-			  axis.y, 
-			  ( ray.z - origin.z ) * t + origin.z };  
-    
-    if( abs( intersection.z - cubeCenter.z ) < cubeRadius && 
-	abs( intersection.x - cubeCenter.x ) < cubeRadius ){
-      ans.r = 1;
-      ans.g = 0;
-      ans.b = 1;
-    }
-  }
-  if( origin.z < cubeCenter.z - cubeRadius )
-    axis.z = cubeCenter.z - cubeRadius;
-  else if( origin.z > cubeCenter.z + cubeRadius )
-    axis.z = cubeCenter.z + cubeRadius;
-  if( axis.z != 0.0 ){
-    t = ( axis.z - origin.z ) / ( ray.z - origin.z );
-    vec3 intersection = { ( ray.x - origin.x ) * t + origin.x,
-			  ( ray.y - origin.y ) * t + origin.y,
-			  axis.z };  
-    
-    if( abs( intersection.y - cubeCenter.y ) < cubeRadius && 
-	abs( intersection.x - cubeCenter.x ) < cubeRadius ){
-      ans.r = 1;
-      ans.g = 1;
-      ans.b = 0;
-    }
-  }
-  return ( dot( ans, ans ) != 0 );
 }

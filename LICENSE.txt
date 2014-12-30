@@ -1,4 +1,4 @@
-This software includes GLEW and SDL, thier licenses are found at the bottom of this text.
+This software includes GLEW and SDL, their licenses are found at the bottom of this text.
 
 The rest of this software (LNZ) is copyright Jonathan(Jon) DuBois. 
 

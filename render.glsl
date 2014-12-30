@@ -11,10 +11,13 @@ layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
 
 // Size of buffer that needs to be cleared.
 uniform uint gcount;
+uniform vec4 screen;
 
 void main( void ){ 
   int i = int( gl_GlobalInvocationID.x );
-  if( i < gcount )
+  
+  if( i < gcount ){
     imageStore( gbuffer, i, uvec4( 0 ) );
+  }
 }
 

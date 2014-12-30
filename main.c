@@ -7,18 +7,24 @@
 #include <stdio.h>
 #include "math.h"
 
-#define PARTICLE_GROUPS 64
-#define PARTICLE_COUNT ( 1024 * PARTICLE_GROUPS )
+#define COMPUTE_GROUPS 64
+#define COMPUTE_GROUP_SIZE 1024
+#define COMPUTE_COUNT ( COMPUTE_GROUP_SIZE * COMPUTE_GROUPS )
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
+
+#define OCTREE_SIZE 256
+// 10 uints, normal, color, and 8 kids.
+#define OCTREE_NODE_SIZE 40
 
 
 int movingWindow = 0;
 int fullscreen = 0;
 int dwidth, dheight;
 int pixelSize = 1;
+// Amortized time.
 float sfps = 30.0;
 float rotx = 0, roty = 0, drotx = 0, droty = 0;
 int rel = 0;
@@ -225,7 +231,7 @@ int main( int argc, char* argv[] ){
 
   u64 sz;
   GLuint shd[ 2 ];
-  u8* dt = LNZLoadResourceOrDie( "main.glsl", &sz );
+  u8* dt = LNZLoadResourceOrDie( "render.glsl", &sz );
   shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_COMPUTE_SHADER );
   GLuint prg = LNZLinkOrDie( 1, shd );
   dt = LNZLoadResourceOrDie( "gbuffer.frag", &sz );
@@ -233,15 +239,12 @@ int main( int argc, char* argv[] ){
   dt = LNZLoadResourceOrDie( "gbuffer.vert", &sz );
   shd[ 1 ] = LNZCompileOrDie( (char*)dt, GL_VERTEX_SHADER );
   GLuint bprg = LNZLinkOrDie( 2, shd );
-  dt = LNZLoadResourceOrDie( "init.glsl", &sz );
-  shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_COMPUTE_SHADER );
-  GLuint iprg = LNZLinkOrDie( 1, shd );
   
 
 
 
-  // 0 and 2 are position, 1 and 3 are velocity, 4 and 5 are gbuffers.
-  GLuint buffers[ 6 ], texs[ 6 ];
+  // 0 and 1 are gbuffers, 2 is the octree.
+  GLuint buffers[ 3 ], texs[ 3 ];
 
   GLuint screenQuadBuffer;
   GLfloat screenQuad[ 8 ] = { -1, -1, 1, -1, 1, 1, -1, 1 };
@@ -251,57 +254,23 @@ int main( int argc, char* argv[] ){
 		screenQuad, GL_STREAM_DRAW );
   
 
-  glGenBuffers( 6, buffers );
+  glGenBuffers( 3, buffers );
 
-  glBindBuffer(GL_ARRAY_BUFFER, buffers[ 0 ] );
-  glBufferData(GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof( GLfloat ) * 4,
-	       NULL, GL_DYNAMIC_COPY );
-
-  // Randomize positions and velocities.
-  GLfloat* positions = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
-  for( u32 i = 0; i < PARTICLE_COUNT; ++i ){
-    for( u32 k = 0; k < 3; ++k )
-      positions[ i * 4 + k ] = ( rand() / (double)RAND_MAX ) * 20.0 - 10.0;
-    positions[ i * 4 + 3 ] = rand() / (double)RAND_MAX;
-  }
-  glUnmapBuffer( GL_ARRAY_BUFFER );
-  glBindBuffer(GL_ARRAY_BUFFER, buffers[ 1 ] );
-  glBufferData(GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof( GLfloat ) * 4,
-	       NULL, GL_DYNAMIC_COPY );
-  GLfloat* velocities = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
-  for( u32 i = 0; i < PARTICLE_COUNT; ++i ){
-    for( u32 k = 0; k < 3; ++k )
-      velocities[ i * 4 + k ] = ( rand() / (double)RAND_MAX ) * 0.2 - 0.1;
-    velocities[ i * 4 + 3 ] = 0;
-  }
-  glUnmapBuffer( GL_ARRAY_BUFFER );
-
-  for( u32 i = 2; i < 4; ++i ){
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[ i ] );
-    glBufferData( GL_ARRAY_BUFFER, PARTICLE_COUNT * sizeof( GLfloat ) * 4,
-		  NULL, GL_DYNAMIC_COPY );
-  }
-  for( u32 i = 4; i < 6; ++i ){
+  for( u32 i = 0; i < 2; ++i ){
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ i ] );
     glBufferData( GL_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
 		  NULL, GL_DYNAMIC_COPY );
   }
+  glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
+  glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE,
+		  NULL, GL_DYNAMIC_COPY );
+  
 
-  glGenTextures( 6, texs );
-  for( u32 i = 0; i < 4; ++i ){
-    glBindTexture( GL_TEXTURE_BUFFER, texs[ i ] );
-    glTexBuffer( GL_TEXTURE_BUFFER, GL_RGBA32F, buffers[ i ] );
-  }
-  for( u32 i = 4; i < 6; ++i ){
+  glGenTextures( 3, texs );
+  for( u32 i = 0; i < 3; ++i ){
     glBindTexture( GL_TEXTURE_BUFFER, texs[ i ] );
     glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ i ] );
   }
-
-  GLuint ubuf;
-  glGenBuffers( 1, &ubuf );
-  glBindBuffer( GL_UNIFORM_BUFFER, ubuf );
-  glBufferData( GL_UNIFORM_BUFFER, 64 * sizeof( GLfloat ) * 4, NULL,
-		GL_DYNAMIC_COPY );
   
 
   GLuint screenQuadVao;
@@ -315,23 +284,18 @@ int main( int argc, char* argv[] ){
   
   double time = rand();
   u64 ntime = SDL_GetPerformanceCounter();
-  GLuint dtloc = glGetUniformLocation( prg, "dt" );
-  GLuint smvploc = glGetUniformLocation( prg, "mvp" );
   GLuint rmvloc = glGetUniformLocation( bprg, "rmv" );
   GLuint bscreenloc = glGetUniformLocation( bprg, "screen" );
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
-  GLuint gcountloc = glGetUniformLocation( iprg, "gcount" );
-  GLfloat amasses[ 64 ];
-  int bsel = 0, nbsel = 2;
+  GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
+  int bsel = 0, nbsel = 1;
 
-  for( u32 i = 0; i < 64; ++i )
-    amasses[ i ] = rand() / (double)RAND_MAX + 1;
   while( 1 ){
     LNZLoop();
     {
       GLuint er = glGetError();
       if( er != GL_NO_ERROR ){
-	printf( "\n\nOpenGL Error Number %x!\n\n", er );
+	SDL_Log( "\n\nOpenGL Error Number %x!\n\n", er );
 	exit( 42 );
       }
     }
@@ -344,30 +308,11 @@ int main( int argc, char* argv[] ){
     if( dtime )
       sfps = sfps * 0.95 + 0.05 / dtime;
     
-    glBindBuffer( GL_UNIFORM_BUFFER, ubuf );
-    GLfloat* attractors =
-      (GLfloat*)glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
-
-    for( int i = 0; i < 64; i++ ){
-      attractors[ i * 4 + 0 ] =  sin(time * (double)(i + 4) * 7.5 * 0.2)
-      	* 50.0f;
-      attractors[ i * 4 + 1 ] = cos(time * (double)(i + 7) * 3.9 * 0.2)
-      	* 50.0f;
-      attractors[ i * 4 + 2 ] = sin(time * (double)(i + 3) * 5.3 * 0.2)
-      	* cos(time * (double)(i + 5) * 0.91f) * 100.0f;
-      attractors[ i * 4 + 3 ] = amasses[ i ] * 15.0;
-    }
-    if( blowup ){
-      attractors[ 0 ] = attractors[ 1 ] = attractors[ 2 ] = 0.0;
-      attractors[ 1 ] = 10;
-      attractors[ 3 ] = 16.15;
-    }
-    glUnmapBuffer( GL_UNIFORM_BUFFER );
-    glBindBufferBase( GL_UNIFORM_BUFFER, 0, ubuf );
 
     rotx += udtime * drotx * 2;
     roty += udtime * droty * 2;
     
+    // Model view projection, model view, inverse model view and projection matrices.
     lmat mvp, mv, rmv, proj;    
     float aspect = sqrt( dwidth / (double)dheight );
     {
@@ -390,45 +335,25 @@ int main( int argc, char* argv[] ){
 
     } 
 
-    // Clear gbuffer. glClearBufferData is unreliable.
-    glUseProgram( iprg );
-    glBindImageTexture( 0, texs[ 4 + bsel / 2 ], 0, GL_FALSE, 0,
+    // Render to gbuffer.
+    glUseProgram( prg );
+    glBindImageTexture( 0, texs[ nbsel ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
-    glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
-		       1024 + 1, 1, 1 );
-
-     
-    glUseProgram( prg );
-    glBindImageTexture( 0, texs[ 1 + bsel ], 0, GL_FALSE, 0,
-			GL_READ_ONLY, GL_RGBA32F );
-    glBindImageTexture( 1, texs[ 0 + bsel ], 0, GL_FALSE, 0, 
-			GL_READ_ONLY, GL_RGBA32F );
-    glBindImageTexture( 2, texs[ 1 + nbsel ], 0, GL_FALSE, 0, 
-			GL_WRITE_ONLY, GL_RGBA32F );
-    glBindImageTexture( 3, texs[ 0 + nbsel ], 0, GL_FALSE, 0, 
-			GL_WRITE_ONLY, GL_RGBA32F );
-    
-    glBindImageTexture( 4, texs[ 4 + bsel / 2 ], 0, GL_FALSE, 0, 
-			GL_READ_WRITE, GL_R32UI );
-    
-    glUniform1f( dtloc, dtime * 20 );
-    glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize, 
-		 10.0 * ( 1024.0 * 1024.0 ) / ( PARTICLE_COUNT * pixelSize ), 
-		 0 );
-    glUniformMatrix4fv( smvploc, 1, GL_FALSE, mvp );
-    
-    glDispatchCompute( PARTICLE_GROUPS, 1, 1 );
-
-    
       
+    glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
+		 pixelSize, aspect );
+    
+    glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
+		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
+    
     // Render quad.
     glUseProgram( bprg );
     glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, pixelSize, aspect );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
-
+   
     glBindVertexArray( screenQuadVao );
-    glBindImageTexture( 4, texs[ 4 + bsel / 2 ], 0, GL_FALSE, 0, 
+    glBindImageTexture( 4, texs[ bsel ], 0, GL_FALSE, 0, 
 			GL_READ_WRITE, GL_R32UI );
     glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
 
@@ -436,9 +361,9 @@ int main( int argc, char* argv[] ){
 
     if( bsel ){
       bsel = 0;
-      nbsel = 2;
+      nbsel = 1;
     } else{
-      bsel = 2;
+      bsel = 1;
       nbsel = 0;
     }
   }
