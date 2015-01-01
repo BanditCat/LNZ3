@@ -7,17 +7,13 @@
 #include <stdio.h>
 #include "math.h"
 
-#define COMPUTE_GROUPS 64
 #define COMPUTE_GROUP_SIZE 1024
-#define COMPUTE_COUNT ( COMPUTE_GROUP_SIZE * COMPUTE_GROUPS )
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 20000000
-// 10 uints, normal, color, and 8 kids.
-#define OCTREE_NODE_SIZE 40
 
 
 int movingWindow = 0;
@@ -264,7 +260,16 @@ int main( int argc, char* argv[] ){
   glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
   glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE,
 		  NULL, GL_DYNAMIC_COPY );
-  
+  GLuint* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+  octree[ 0 ] = 0;
+  /* for( u32 i = 0; i < PARTICLE_COUNT; ++i ){ */
+  /*   for( u32 k = 0; k < 3; ++k ) */
+  /*     positions[ i * 4 + k ] = ( rand() / (double)RAND_MAX ) * 20.0 - 10.0; */
+  /*   positions[ i * 4 + 3 ] = rand() / (double)RAND_MAX; */
+  /* } */
+  glUnmapBuffer( GL_ARRAY_BUFFER );
+
+
 
   glGenTextures( 3, texs );
   for( u32 i = 0; i < 3; ++i ){
@@ -289,6 +294,8 @@ int main( int argc, char* argv[] ){
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
   GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
   int bsel = 0, nbsel = 1;
+
+  
 
   while( 1 ){
     LNZLoop();

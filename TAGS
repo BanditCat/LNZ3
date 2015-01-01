@@ -1,5 +1,5 @@
 
-lmat.h,365
+lmat.h,384
 #define LMAT_H8,281
 typedef GLfloat lmat[lmat10,297
 typedef GLfloat lvec[lvec11,325
@@ -11,10 +11,11 @@ void lmmult(17,508
 void lmprojection(18,541
 void lmtranslate(19,575
 void lmtranspose(20,607
-float lmdeterminate(23,658
-void lvcross(25,701
-float lvdot(26,735
-void lvnormalize(27,774
+void lminvert(21,633
+void lmlogMatrix(22,656
+void lvcross(24,691
+float lvdot(25,725
+void lvnormalize(26,764
 
 lnz.h,882
 #define LNZ_H8,279
@@ -47,7 +48,22 @@ u8* LNZLoadResourceOrDie(90,2962
 GLuint LNZCompileOrDie(93,3067
 GLuint LNZLinkOrDie(95,3175
 
-lmat.c,287
+loctree.h,342
+#define LOCTREE_H8,295
+#define OCTREE_NODE_SIZE 11,393
+#define UNEXPLORED_CHILD 13,422
+#define FULL_CHILD 14,459
+#define EMPTY_CHILD 15,490
+#define SUPERSAMPLE_DIM 17,523
+u32 lpack(19,550
+void lunpack(20,577
+u32 lpackNormal(21,610
+void lunpackNormal(22,643
+void initOctree(24,683
+void growOctree(25,742
+void calculateNode(26,812
+
+lmat.c,359
 void lmidentity(7,262
 void lmcopy(15,427
 void lmscale(19,527
@@ -55,11 +71,14 @@ void lmbasis(32,795
 void lmprojection(48,1296
 void lmtranslate(63,1628
 void lmmult(76,1894
-float lmdeterminate(88,2189
-void lmtranspose(111,2673
-void lvcross(118,2838
-void lvnormalize(124,3055
-float lvdot(129,3168
+void lmtranspose(89,2190
+void lmlogMatrix(96,2351
+void lvcross(106,2784
+void lvnormalize(112,3001
+float lvdot(117,3114
+float Determinant(128,3395
+void CoFactor(170,4286
+void lminvert(210,5127
 
 lnz.c,386
 SDL_DisplayMode fullscreenDM 9,365
@@ -76,29 +95,36 @@ void LNZSetWindowHandler(166,5285
 GLuint LNZCompileOrDie(170,5375
 GLuint LNZLinkOrDie(199,6184
 
+loctree.c,115
+u32 lpack(8,280
+void lunpack(26,638
+u32 lpackNormal(32,811
+void lunpackNormal(50,1188
+void initOctree(58,1431
+
 main.c,508
-#define PARTICLE_GROUPS 10,320
-#define PARTICLE_COUNT 11,347
-#define GBUFFER_WIDTH 13,398
-#define GBUFFER_HEIGHT 14,439
-#define GBUFFER_SIZE 15,481
-int movingWindow 18,539
-int fullscreen 19,561
-int dwidth,20,581
-int dwidth, dheight;20,581
-int pixelSize 21,602
-float sfps 22,621
-float rotx 23,640
-int rel 24,688
-int blowup 25,701
-float scale 26,717
-lvec trns 27,734
-u64 disableMouseTime 28,760
-void keys(30,787
-void touches(79,2362
-void wms(147,4506
-void mice(154,4702
-int main(209,6201
+#define COMPUTE_GROUP_SIZE 10,320
+#define GBUFFER_WIDTH 12,353
+#define GBUFFER_HEIGHT 13,394
+#define GBUFFER_SIZE 14,436
+#define OCTREE_SIZE 16,493
+int movingWindow 19,524
+int fullscreen 20,546
+int dwidth,21,566
+int dwidth, dheight;21,566
+int pixelSize 22,587
+float sfps 24,625
+float rotx 25,644
+int rel 26,692
+int blowup 27,705
+float scale 28,721
+lvec trns 29,738
+u64 disableMouseTime 30,764
+void keys(32,791
+void touches(81,2366
+void wms(149,4510
+void mice(156,4706
+int main(211,6205
 
 os.c,120
 #define WIN32_LEAN_AND_MEAN6,284

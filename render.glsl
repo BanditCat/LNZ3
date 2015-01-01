@@ -7,7 +7,7 @@
 layout( local_size_x = 1024 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
-//layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
+layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
 
 // Size of buffer that needs to be cleared.
 uniform uint gcount;
@@ -19,6 +19,7 @@ float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 		   in float cubeRadius );
 float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
 		     in vec3 cubeCenter, in float cubeRadius );
+uint pack( in vec3 ans );
 
 void main( void ){ 
   uint index = uint( gl_GlobalInvocationID.x );
@@ -41,17 +42,24 @@ void main( void ){
     ray = normalize( ( vec4( ray, 1.0 ) * rmv ).xyz - origin );
     vec3 col;
     uint i;
-    for( i = 0;  i < 16; ++i ){
-      float t = raycastCube( origin, ray, cubeCenter, cubeRadius );
+    for( i = 0;  i < 10; ++i ){
+      float t = raycastOctree( origin, ray, octree, cubeCenter, cubeRadius );
       if( t > 0.0 )
 	ans = vec3( 0.0, 1.0, 0.5 ) * vec3( t / 10 );
       else
-	ans = vec3( 1.0 );
+	ans = vec3( 0.0 );
     }
     
-    imageStore( gbuffer, int( index ), uvec4( uint( ans.g * 10000 ) ) );
+    
+    imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
 
   }
+}
+uint pack( in vec3 ans ){
+  uint val = uint( clamp( ans.r, 0.0, 1.0 ) * 2047.0 );
+  val += uint( clamp( ans.g, 0.0, 1.0 ) * 2047.0 ) << 11;
+  val += uint( clamp( ans.b, 0.0, 1.0 ) * 1023.0 ) << 22;
+  return val;
 }
 float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
 		   in float cubeRadius ){
@@ -75,7 +83,7 @@ uniform uint octreeSize = 10;
 uniform uint octreeNormal = 0;
 uniform uint octreeColor = 1;
 uniform uint octreeChildren = 2;
-
+uniform uint maxCount = 16;
 
 float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
 		     in vec3 cubeCenter, in float cubeRadius ){
@@ -95,7 +103,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree,
   centers[ 0 ] = cubeCenter;
   radii[ 0 ] = cubeRadius;
 
-  for( uint c = 0; c < 16; ++c ){
+  for( uint c = 0; c < maxCount; ++c ){
     for( uint i = 0; i < 8; ++i ){
  
       vec3 newCenter = { ( ( i >> 0 ) & 1 ) * 2.0 - 1.0,

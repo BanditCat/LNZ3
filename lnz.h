@@ -95,5 +95,6 @@ GLuint LNZCompileOrDie( char* source, GLenum type );
 GLuint LNZLinkOrDie( u32 count, const GLuint* shaders );
 
 #include "lmat.h"
+#include "loctree.h"
 
 #endif //LNZ_H 

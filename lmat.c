@@ -103,6 +103,19 @@ void lmlogMatrix( const lmat m ){
       SDL_Log( "  %4.4f, %4.4f, %4.4f, %4.4f\n", m[ 0 + i * 4], m[ 1 + i * 4], m[ 2 + i * 4 ], m[ 3 + i * 4 ] );
   }
 }
+void lvcopy( lvec v, const lvec w ){
+  for( u32 i = 0; i < 3; ++i )
+    v[ i ] = w[ i ];
+}
+
+void lvadd( lvec v, const lvec w ){
+  for( u32 i = 0; i < 3; ++i )
+    v[ i ] += w[ i ];
+}
+void lvscale( lvec v, float s ){
+  for( u32 i = 0; i < 3; ++i )
+    v[ i ] *= s;
+}
 void lvcross( lvec a, const lvec b ){
   lvec t = { a[ 0 ], a[ 1 ], a[ 2 ] };
   a[ 0 ] = t[ 1 ] * b[ 2 ] - t[ 2 ] * b[ 1 ];

@@ -21,7 +21,10 @@ void lmtranspose( lmat );
 void lminvert( lmat );
 void lmlogMatrix( const lmat m );
 
+void lvcopy( lvec, const lvec );
 void lvcross( lvec, const lvec );
+void lvscale( lvec, float );
+void lvadd( lvec v, const lvec w );
 float lvdot( const lvec, const lvec );
 void lvnormalize( lvec );
 
