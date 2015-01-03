@@ -287,11 +287,11 @@ int main( int argc, char* argv[] ){
     // Build wireframe
     GLfloat* wireframeData = malloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
     u32* nodes = malloc( WIREFRAME_SIZE * sizeof( u32 ) );
-    u32 count = 20;
+    u32 count = 200;
      
 
-    for( u32 i = 0; i < 100; ++i ){
-      wireframeData[ i ] = ( (float)rand() ) / ( (float)RAND_MAX );
+    for( u32 i = 0; i < 600; ++i ){
+      wireframeData[ i ] = ( (float)rand() * 20.0 ) / ( (float)RAND_MAX ) - 10.0;
     }
 
   
@@ -380,8 +380,7 @@ int main( int argc, char* argv[] ){
       lmcopy( rmv, mv );
       lminvert( rmv );
       lmidentity( proj );
-      //lmprojection( proj, 0.0125 );
-      lmprojection2( proj, 90, aspect, 1.0, 1000.0 );
+      lmprojection2( proj, pi / 2, aspect, 0.1, 1000.0 );
       lmcopy( mvp, mv );
       lmmult( mvp, proj );
 
@@ -418,7 +417,7 @@ int main( int argc, char* argv[] ){
       glUniformMatrix4fv( mvploc, 1, GL_FALSE, mvp );
 
       glBindVertexArray( wireframeVao );
-      glDrawArrays( GL_LINES, 0, 20 );
+      glDrawArrays( GL_LINES, 0, 100 );
     }
 
 
