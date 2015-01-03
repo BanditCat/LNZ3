@@ -45,21 +45,8 @@ void lmbasis( lmat mat, const lvec up, const lvec right ){
   }
   lmmult( mat, m );
 }  
-void lmprojection( lmat mat, float s ){  
-  lmat m;
-  for( u32 i = 0; i < 4; ++i )
-    for( u32 j = 0; j < 4; ++j )
-      if( i == j && i < 2 )
-	  m[ i * 4 + j ] = 1;
-      else if( i == 3 && j == 2 )
-	m[ i * 4 + j ] = s;
-      else if( i == 2 && j == 3 )
-	m[ i * 4 + j ] = 1;
-      else
-	m[ i * 4 + j ] = 0;
-  lmmult( mat, m );
-}
-void lmprojection2( lmat mat, float fov, float aspect, float near, float far ){  
+
+void lmprojection( lmat mat, float fov, float aspect, float near, float far ){  
   lmat m;
   float depth = far - near;
   

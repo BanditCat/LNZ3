@@ -17,9 +17,14 @@
 
 #define WIREFRAME_SIZE 8192
 
+#define FOV_MINIMUM ( pi * 0.01 )
+#define FOV_MAXIMUM ( pi * 0.99 )
 
 int movingWindow = 0;
-int wireframe = 1;
+int movingFov = 0;
+float fov = pi / 2.0;
+
+int wireframe = 0;
 int fullscreen = 0;
 int dwidth, dheight;
 int pixelSize = 1;
@@ -62,6 +67,10 @@ void keys( const SDL_Event* ev ){
     dwidth = x;
     dheight = y;
     glViewport( 0, 0, x, y );
+  } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_v ){
+    movingFov = 1;
+  } else if( ev->key.state == SDL_RELEASED && ev->key.keysym.sym == SDLK_v ){
+    movingFov = 0;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_SPACE ){
     if( scale )
       scale = 0;
@@ -150,6 +159,32 @@ void touches( const SDL_Event* ev ){
       trns[ 2 ] += ( dist - odist ) * -400;
       trns[ 0 ] += ev->tfinger.dx * 100;
       trns[ 1 ] += ev->tfinger.dy * -100;
+    } else if( SDL_GetNumTouchFingers( ev->tfinger.touchId ) == 3 ){
+      SDL_Finger* f0 = SDL_GetTouchFinger( ev->tfinger.touchId, 0 );
+      SDL_Finger* f1 = SDL_GetTouchFinger( ev->tfinger.touchId, 1 );
+      SDL_Finger* f2 = SDL_GetTouchFinger( ev->tfinger.touchId, 2 );
+      float dx0 = 0, dy0 = 0, dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+      if( ev->tfinger.fingerId == f0->id ){
+	dx0 = ev->tfinger.dx; dy0 = ev->tfinger.dy;
+      } else if( ev->tfinger.fingerId == f1->id ){
+	dx1 = ev->tfinger.dx; dy1 = ev->tfinger.dy;
+      } else if( ev->tfinger.fingerId == f2->id ){
+	dx2 = ev->tfinger.dx; dy2 = ev->tfinger.dy;
+      } 
+      float dist = sqrt( pow( f0->x + dx0 - f1->x, 2.0 ) +
+			 pow( f0->y + dy0 - f1->y, 2.0 ) );
+      dist += sqrt( pow( f1->x + dx1 - f2->x, 2.0 ) +
+		    pow( f1->y + dy1 - f2->y, 2.0 ) ); 
+      dist += sqrt( pow( f2->x + dx2 - f0->x, 2.0 ) +
+		    pow( f2->y + dy2 - f0->y, 2.0 ) ); 
+      float odist = sqrt( pow( f0->x - f1->x, 2.0 ) + pow( f0->y - f1->y, 2.0 ) );
+      odist += sqrt( pow( f1->x - f2->x, 2.0 ) + pow( f1->y - f2->y, 2.0 ) ); 
+      odist += sqrt( pow( f2->x - f0->x, 2.0 ) + pow( f2->y - f0->y, 2.0 ) ); 
+      fov += ( dist - odist ) * 4.0;
+      if( fov < FOV_MINIMUM )
+	fov = FOV_MINIMUM;
+      if( fov > FOV_MAXIMUM )
+	fov = FOV_MAXIMUM;
     }
   }
 }
@@ -198,6 +233,12 @@ void mice( const SDL_Event* ev ){
 	  y = fullscreenDM.h - 64;
 	SDL_SetWindowPosition( mainWindow, x, y );
       }
+    } else if( movingFov ){
+      fov += ev->motion.yrel / 512.0;
+      if( fov < FOV_MINIMUM )
+	fov = FOV_MINIMUM;
+      if( fov > FOV_MAXIMUM )
+	fov = FOV_MAXIMUM;
     } else{
       if( ev->motion.state & SDL_BUTTON_LMASK ){
 	trns[ 0 ] += ev->motion.xrel * 0.05;
@@ -274,6 +315,7 @@ int main( int argc, char* argv[] ){
  
   
   GLuint wireframeBuffer;
+  u32 actualWireframeSize = 8192;
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -282,31 +324,30 @@ int main( int argc, char* argv[] ){
     
     sphereParams sp = { { 0.0, 0.2, 0.3 }, 0.5 };
     initOctree( sphere, octree, &sp );
-    glUnmapBuffer( GL_ARRAY_BUFFER );
 
     // Build wireframe
     GLfloat* wireframeData = malloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
     u32* nodes = malloc( WIREFRAME_SIZE * sizeof( u32 ) );
-    u32 count = 200;
      
-
-    for( u32 i = 0; i < 600; ++i ){
+    
+    for( u32 i = 0; i < actualWireframeSize * 6; ++i ){
       wireframeData[ i ] = ( (float)rand() * 20.0 ) / ( (float)RAND_MAX ) - 10.0;
     }
 
+    glUnmapBuffer( GL_ARRAY_BUFFER );
   
   
     glGenBuffers( 1, &wireframeBuffer );
     glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
-    glBufferData( GL_ARRAY_BUFFER, count * 6 * sizeof( GLfloat ), wireframeData, 
-		  GL_STREAM_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, actualWireframeSize * 6 * sizeof( GLfloat ), 
+		  wireframeData, GL_STREAM_DRAW );
 
     free( wireframeData );
     free( nodes );
 
   }
     
- 
+  
 
   glGenTextures( 3, texs );
   for( u32 i = 0; i < 3; ++i ){
@@ -339,6 +380,7 @@ int main( int argc, char* argv[] ){
   GLuint bscreenloc = glGetUniformLocation( bprg, "screen" );
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
   GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
+  GLuint fovloc = glGetUniformLocation( prg, "fov" );
   int bsel = 0, nbsel = 1;
 
   
@@ -380,7 +422,7 @@ int main( int argc, char* argv[] ){
       lmcopy( rmv, mv );
       lminvert( rmv );
       lmidentity( proj );
-      lmprojection2( proj, pi / 2, aspect, 0.1, 1000.0 );
+      lmprojection( proj, fov, aspect, 0.0125, 1024.0 );
       lmcopy( mvp, mv );
       lmmult( mvp, proj );
 
@@ -396,6 +438,7 @@ int main( int argc, char* argv[] ){
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
 		 pixelSize, aspect );
+    glUniform1f( fovloc, fov );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
     
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
@@ -417,7 +460,7 @@ int main( int argc, char* argv[] ){
       glUniformMatrix4fv( mvploc, 1, GL_FALSE, mvp );
 
       glBindVertexArray( wireframeVao );
-      glDrawArrays( GL_LINES, 0, 100 );
+      glDrawArrays( GL_LINES, 0, actualWireframeSize * 2 );
     }
 
 

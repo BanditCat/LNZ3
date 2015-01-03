@@ -13,6 +13,7 @@ layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
 uniform uint gcount;
 uniform vec4 screen;
 uniform mat4 rmv;
+uniform float fov;
 
 
 float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
@@ -33,7 +34,7 @@ void main( void ){
     float x = ( float( index % uint( screen.x ) ) / ( screen.x - 1.0 ) ) * 2.0 - 1.0;
     float y = ( float( index / uint( screen.x ) ) / ( screen.y - 1.0 ) ) * 2.0 - 1.0;
     
-    vec3 ray = { x * screen.w, y / screen.w, 1.0 };
+    vec3 ray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
   
     vec3 cubeCenter = { 0.0, 0.0, 0.0 };
     float cubeRadius = 10;
