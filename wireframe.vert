@@ -3,12 +3,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #version 430 core
-in vec2 vposition; 
+layout( location = 0 ) in vec3 vposition; 
+
+uniform mat4 mvp;
 
 void main() { 
-  vec4 t = vposition.xyyy;
-  t.z = 0.5;
+  vec4 t = vposition.xyzz;
   t.w = 1;
+  t = t * mvp;
   gl_Position = t;
 }
 

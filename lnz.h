@@ -12,6 +12,7 @@
 #define GLEW_STATIC
 #include "glew.h"
 #include <limits.h>
+#include <math.h>
 
 // Types.
 typedef unsigned char u8;
@@ -96,5 +97,6 @@ GLuint LNZLinkOrDie( u32 count, const GLuint* shaders );
 
 #include "lmat.h"
 #include "loctree.h"
+#include "lshapes.h"
 
 #endif //LNZ_H 

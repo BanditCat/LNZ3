@@ -3,12 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #version 430 core
-in vec2 vposition; 
+layout( location = 0 ) out vec4 color;
 
-void main() { 
-  vec4 t = vposition.xyyy;
-  t.z = 0.5;
-  t.w = 1;
-  gl_Position = t;
+
+ 
+void main( void ){ 
+  color = vec4( 1.0 );
+  color.b = 0.3;
 }
 

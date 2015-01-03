@@ -15,8 +15,11 @@
 
 #define OCTREE_SIZE 20000000
 
+#define WIREFRAME_SIZE 8192
+
 
 int movingWindow = 0;
+int wireframe = 1;
 int fullscreen = 0;
 int dwidth, dheight;
 int pixelSize = 1;
@@ -45,6 +48,11 @@ void keys( const SDL_Event* ev ){
       blowup = 0;
     else
       blowup = 1;
+  } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_w ){
+    if( wireframe )
+      wireframe = 0;
+    else
+      wireframe = 1;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_m ){
     movingWindow = 1;
   } else if( ev->key.state == SDL_RELEASED && ev->key.keysym.sym == SDLK_m ){
@@ -235,6 +243,11 @@ int main( int argc, char* argv[] ){
   dt = LNZLoadResourceOrDie( "gbuffer.vert", &sz );
   shd[ 1 ] = LNZCompileOrDie( (char*)dt, GL_VERTEX_SHADER );
   GLuint bprg = LNZLinkOrDie( 2, shd );
+  dt = LNZLoadResourceOrDie( "wireframe.frag", &sz );
+  shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_FRAGMENT_SHADER );
+  dt = LNZLoadResourceOrDie( "wireframe.vert", &sz );
+  shd[ 1 ] = LNZCompileOrDie( (char*)dt, GL_VERTEX_SHADER );
+  GLuint wprg = LNZLinkOrDie( 2, shd );
   
 
 
@@ -249,6 +262,7 @@ int main( int argc, char* argv[] ){
   glBufferData( GL_ARRAY_BUFFER, 4 * sizeof( GLfloat ) * 2,
 		screenQuad, GL_STREAM_DRAW );
   
+  
 
   glGenBuffers( 3, buffers );
 
@@ -257,19 +271,42 @@ int main( int argc, char* argv[] ){
     glBufferData( GL_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
 		  NULL, GL_DYNAMIC_COPY );
   }
-  glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
-  glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE,
+ 
+  
+  GLuint wireframeBuffer;
+  {
+    glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
+    glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_DYNAMIC_COPY );
-  GLuint* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
-  octree[ 0 ] = 0;
-  /* for( u32 i = 0; i < PARTICLE_COUNT; ++i ){ */
-  /*   for( u32 k = 0; k < 3; ++k ) */
-  /*     positions[ i * 4 + k ] = ( rand() / (double)RAND_MAX ) * 20.0 - 10.0; */
-  /*   positions[ i * 4 + 3 ] = rand() / (double)RAND_MAX; */
-  /* } */
-  glUnmapBuffer( GL_ARRAY_BUFFER );
+    GLuint* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
+    
+    sphereParams sp = { { 0.0, 0.2, 0.3 }, 0.5 };
+    initOctree( sphere, octree, &sp );
+    glUnmapBuffer( GL_ARRAY_BUFFER );
 
+    // Build wireframe
+    GLfloat* wireframeData = malloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
+    u32* nodes = malloc( WIREFRAME_SIZE * sizeof( u32 ) );
+    u32 count = 20;
+     
 
+    for( u32 i = 0; i < 100; ++i ){
+      wireframeData[ i ] = ( (float)rand() ) / ( (float)RAND_MAX );
+    }
+
+  
+  
+    glGenBuffers( 1, &wireframeBuffer );
+    glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
+    glBufferData( GL_ARRAY_BUFFER, count * 6 * sizeof( GLfloat ), wireframeData, 
+		  GL_STREAM_DRAW );
+
+    free( wireframeData );
+    free( nodes );
+
+  }
+    
+ 
 
   glGenTextures( 3, texs );
   for( u32 i = 0; i < 3; ++i ){
@@ -282,13 +319,22 @@ int main( int argc, char* argv[] ){
   glGenVertexArrays( 1, &screenQuadVao );
   glBindVertexArray( screenQuadVao );
   glBindBuffer( GL_ARRAY_BUFFER, screenQuadBuffer );
-  glBindAttribLocation( bprg, 0, "vPosition" );
+  glBindAttribLocation( bprg, 0, "vposition" );
   glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0 );
+  glEnableVertexAttribArray( 0 );
+
+  GLuint wireframeVao;
+  glGenVertexArrays( 1, &wireframeVao );
+  glBindVertexArray( wireframeVao );
+  glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
+  glBindAttribLocation( wprg, 0, "vposition" );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
   glEnableVertexAttribArray( 0 );
 
   
   double time = rand();
   u64 ntime = SDL_GetPerformanceCounter();
+  GLuint mvploc = glGetUniformLocation( wprg, "mvp" );
   GLuint rmvloc = glGetUniformLocation( prg, "rmv" );
   GLuint bscreenloc = glGetUniformLocation( bprg, "screen" );
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
@@ -323,7 +369,6 @@ int main( int argc, char* argv[] ){
     lmat mvp, mv, rmv, proj;    
     float aspect = sqrt( dwidth / (double)dheight );
     {
-      lvec sc = { 0.013 / aspect, 0.013 * aspect, 0.13 };
       lvec up = { cosf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ), 
 		  cosf( roty * 5 ), 
 		  sinf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ) };
@@ -335,8 +380,8 @@ int main( int argc, char* argv[] ){
       lmcopy( rmv, mv );
       lminvert( rmv );
       lmidentity( proj );
-      lmprojection( proj, 0.0125 );
-      lmscale( proj, sc );
+      //lmprojection( proj, 0.0125 );
+      lmprojection2( proj, 90, aspect, 1.0, 1000.0 );
       lmcopy( mvp, mv );
       lmmult( mvp, proj );
 
@@ -363,8 +408,19 @@ int main( int argc, char* argv[] ){
    
     glBindVertexArray( screenQuadVao );
     glBindImageTexture( 4, texs[ bsel ], 0, GL_FALSE, 0, 
-			GL_READ_WRITE, GL_R32UI );
-    glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+    	GL_READ_WRITE, GL_R32UI );
+     glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
+
+ 
+    // Wireframe of normals
+    if( wireframe ){
+      glUseProgram( wprg );
+      glUniformMatrix4fv( mvploc, 1, GL_FALSE, mvp );
+
+      glBindVertexArray( wireframeVao );
+      glDrawArrays( GL_LINES, 0, 20 );
+    }
+
 
     SDL_GL_SwapWindow( mainWindow );
 

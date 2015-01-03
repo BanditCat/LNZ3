@@ -7,8 +7,10 @@
 render.glsl RCDATA "render.glsl"
 
 gbuffer.frag RCDATA "gbuffer.frag"
+wireframe.frag RCDATA "wireframe.frag"
 
 gbuffer.vert RCDATA "gbuffer.vert"
+wireframe.vert RCDATA "wireframe.vert"
 
 1 VERSIONINFO
 FILEVERSION     0,0,0,1

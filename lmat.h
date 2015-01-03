@@ -16,6 +16,7 @@ void lmscale( lmat, const lvec );
 void lmbasis( lmat, const lvec up, const lvec right );
 void lmmult( lmat, const lmat );
 void lmprojection( lmat, float );
+void lmprojection2( lmat, float fov, float aspect, float near, float far );
 void lmtranslate( lmat, lvec );
 void lmtranspose( lmat );
 void lminvert( lmat );

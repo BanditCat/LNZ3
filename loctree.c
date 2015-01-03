@@ -55,21 +55,21 @@ void lunpackNormal( u32 ans, lvec v ){
     v[ i ] = v[ i ] * 2.0 - 1.0;
 }
 
-void initOctree( int (*inside)( lvec pos ), u32* octree ){
+void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
+		 const void* params ){
   octree[ OCTREE_NODE_SIZE * 0 ] = 1;
   for( u32 i = 0; i < 8; ++i ){
     lvec cc;
     lvcopy( cc, cubeVecs[ i ] );
     lvscale( cc, 0.5 );
     octree[ OCTREE_NODE_SIZE * 0 + 2 + ( octree[ 0 ] - 1 ) ] =
-      calculateNode( inside, cc, 0.5, octree );
+      calculateNode( inside, cc, 0.5, octree, params );
     if( octree[ OCTREE_NODE_SIZE * 0 + 2 + ( octree[ 0 ] - 1 ) ] < (u32)-3 )
       ++octree[ 0 ];
-
   }
 }
-u32 calculateNode( int (*inside)( lvec pos ), const lvec cubeCenter,
-		   float cubeRadius, u32* octree ){
+u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
+		   float cubeRadius, u32* octree, const void* params ){
   lvec col = { 0.0, 0.0, 0.0 };
   lvec normal = { 0.0, 0.0, 0.0 };
   lvec pos;
@@ -85,7 +85,7 @@ u32 calculateNode( int (*inside)( lvec pos ), const lvec cubeCenter,
 	   pos[ 2 ] += ( 2 * cubeRadius ) / ( SUPERSAMPLE_DIM - 1 ) ){
 	lvec t;
 	lvcopy( t, pos );
-	int inchk = inside( t );
+	int inchk = inside( t, params );
 	if( inchk ){
 	  ++coverage;
 	  lvadd( col, t );

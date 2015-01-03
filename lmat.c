@@ -59,6 +59,21 @@ void lmprojection( lmat mat, float s ){
 	m[ i * 4 + j ] = 0;
   lmmult( mat, m );
 }
+void lmprojection2( lmat mat, float fov, float aspect, float near, float far ){  
+  lmat m;
+  float depth = far - near;
+  
+
+  for( u32 i = 0; i < 16; ++i )
+    m[ i ] = 0;
+  m[ 1 + 4 * 1 ] = tan( 0.5f * fov ) * aspect;
+  m[ 0 + 4 * 0 ] = m[ 1 * 4 + 1 ] / aspect;
+  m[ 2 + 4 * 2 ] = far / depth;
+  m[ 3 + 4 * 2 ] = ( -far * near ) / depth;
+  m[ 2 + 4 * 3 ] = 1.0;
+  m[ 3 + 4 * 3 ] = 1.0;
+  lmmult( mat, m );
+}
 
 void lmtranslate( lmat mat, lvec v ){
   lmat m;
