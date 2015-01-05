@@ -26,7 +26,7 @@ u8* LNZLoadResource( const char* name, u64* size ){
   if( ( dt = LockResource( hnd ) ) == NULL )
     return NULL;
   *size = SizeofResource( NULL, rsc );
-  ans = malloc( *size + 1 );
+  ans = lmalloc( *size + 1 );
   memcpy( ans, dt, *size );
   ans[ *size ] = '\0';
   return ans;

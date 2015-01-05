@@ -154,9 +154,9 @@ float Determinant(float **a,int n)
    } else {
       det = 0;
       for (j1=0;j1<n;j1++) {
-         m = malloc((n-1)*sizeof(float *));
+         m = lmalloc((n-1)*sizeof(float *));
          for (i=0;i<n-1;i++)
-            m[i] = malloc((n-1)*sizeof(float));
+            m[i] = lmalloc((n-1)*sizeof(float));
          for (i=1;i<n;i++) {
             j2 = 0;
             for (j=0;j<n;j++) {
@@ -187,9 +187,9 @@ void CoFactor(float **a,int n,float **b)
    float det;
    float **c;
 
-   c = malloc((n-1)*sizeof(float *));
+   c = lmalloc((n-1)*sizeof(float *));
    for (i=0;i<n-1;i++)
-     c[i] = malloc((n-1)*sizeof(float));
+     c[i] = lmalloc((n-1)*sizeof(float));
 
    for (j=0;j<n;j++) {
       for (i=0;i<n;i++) {
@@ -222,11 +222,11 @@ void CoFactor(float **a,int n,float **b)
 }
 
 void lminvert( lmat m ){
-  float **tm = malloc( sizeof( float * ) * 4 );
-  float **tn = malloc( sizeof( float * ) * 4 );
+  float **tm = lmalloc( sizeof( float * ) * 4 );
+  float **tn = lmalloc( sizeof( float * ) * 4 );
   for( u32 i = 0; i < 4; ++i ){
-    tm[ i ] = malloc( sizeof( float ) * 4 );
-    tn[ i ] = malloc( sizeof( float ) * 4 );
+    tm[ i ] = lmalloc( sizeof( float ) * 4 );
+    tn[ i ] = lmalloc( sizeof( float ) * 4 );
     for( u32 j = 0; j < 4; ++j )
       tm[ i ][ j ] = 0 - m[ i * 4 + j ];
   }

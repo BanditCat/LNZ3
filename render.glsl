@@ -36,7 +36,7 @@ void main( void ){
     
     vec3 ray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
   
-    vec3 cubeCenter = { 0.0, 0.0, 0.0 };
+    vec3 cubeCenter = { 20.0, 0.0, 0.0 };
     float cubeRadius = 10;
 
     origin = ( vec4( origin, 1.0 ) * rmv ).xyz;

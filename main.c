@@ -156,7 +156,7 @@ void touches( const SDL_Event* ev ){
       ody = dy - ev->tfinger.dy;
       float odist = sqrt( pow( odx, 2.0 ) + pow( ody, 2.0 ) );
       float dist = sqrt( pow( dx, 2.0 ) + pow( dy, 2.0 ) );
-      trns[ 2 ] += ( dist - odist ) * -400;
+      trns[ 2 ] += ( dist - odist ) * -100;
       trns[ 0 ] += ev->tfinger.dx * 100;
       trns[ 1 ] += ev->tfinger.dy * -100;
     } else if( SDL_GetNumTouchFingers( ev->tfinger.touchId ) == 3 ){
@@ -279,17 +279,21 @@ int main( int argc, char* argv[] ){
   u8* dt = LNZLoadResourceOrDie( "render.glsl", &sz );
   shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_COMPUTE_SHADER );
   GLuint prg = LNZLinkOrDie( 1, shd );
+  free( dt );
   dt = LNZLoadResourceOrDie( "gbuffer.frag", &sz );
   shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_FRAGMENT_SHADER );
+  free( dt );
   dt = LNZLoadResourceOrDie( "gbuffer.vert", &sz );
   shd[ 1 ] = LNZCompileOrDie( (char*)dt, GL_VERTEX_SHADER );
   GLuint bprg = LNZLinkOrDie( 2, shd );
+  free( dt );
   dt = LNZLoadResourceOrDie( "wireframe.frag", &sz );
   shd[ 0 ] = LNZCompileOrDie( (char*)dt, GL_FRAGMENT_SHADER );
+  free( dt );
   dt = LNZLoadResourceOrDie( "wireframe.vert", &sz );
   shd[ 1 ] = LNZCompileOrDie( (char*)dt, GL_VERTEX_SHADER );
   GLuint wprg = LNZLinkOrDie( 2, shd );
-  
+  free( dt );
 
 
 
@@ -315,7 +319,7 @@ int main( int argc, char* argv[] ){
  
   
   GLuint wireframeBuffer;
-  u32 actualWireframeSize = 8192;
+  u32 actualWireframeSize = 1;
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -326,12 +330,59 @@ int main( int argc, char* argv[] ){
     initOctree( sphere, octree, &sp );
 
     // Build wireframe
-    GLfloat* wireframeData = malloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
-    u32* nodes = malloc( WIREFRAME_SIZE * sizeof( u32 ) );
-     
+    GLfloat* wireframeData = lmalloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
+    u32* nodes = lmalloc( WIREFRAME_SIZE * sizeof( u32 ) );
+    lvec* cubeCenters = lmalloc( WIREFRAME_SIZE * sizeof( lvec ) );
+    float* cubeRadii = lmalloc( WIREFRAME_SIZE * sizeof( float ) );
+    nodes[ 0 ] = 0;
+    cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
+    cubeRadii[ 0 ] = 10.0;
     
-    for( u32 i = 0; i < actualWireframeSize * 6; ++i ){
-      wireframeData[ i ] = ( (float)rand() * 20.0 ) / ( (float)RAND_MAX ) - 10.0;
+
+    for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
+      if( octree[ 2 + i ] <= VALID_CHILD ){
+	nodes[ actualWireframeSize ] = octree[ 2 + i ];
+	lvec cc, ad;
+	lvcopy( cc, cubeCenters[ 0 ] );
+	lvcopy( ad, cubeVecs[ i ] );
+	lvscale( ad, cubeRadii[ 0 ] / 2.0 );
+	lvadd( cc, ad );
+	lvcopy( cubeCenters[ actualWireframeSize ], cc );
+	cubeRadii[ actualWireframeSize++ ] = cubeRadii[ 0 ] / 2.0;
+      }	  
+    }
+    u32 oldsize = actualWireframeSize - 1;
+    while( oldsize != actualWireframeSize &&
+	   actualWireframeSize < WIREFRAME_SIZE ){ 
+      oldsize = actualWireframeSize;
+      for( u32 cur = actualWireframeSize - 1; 
+	   cubeRadii[ cur ] == cubeRadii[ cur - 1 ] && 
+	     actualWireframeSize < WIREFRAME_SIZE; 
+	   --cur ){
+	for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
+	  if( octree[ cur * OCTREE_NODE_SIZE + 2 + i ] <= VALID_CHILD ){
+	    nodes[ actualWireframeSize ] = octree[ cur * OCTREE_NODE_SIZE +
+						   2 + i ];
+	    lvec cc, ad;
+	    lvcopy( cc, cubeCenters[ cur ] );
+	    lvcopy( ad, cubeVecs[ i ] );
+	    lvscale( ad, cubeRadii[ cur ] / 2.0 );
+	    lvadd( cc, ad );
+	    lvcopy( cubeCenters[ actualWireframeSize ], cc );
+	    cubeRadii[ actualWireframeSize++ ] = cubeRadii[ cur ] / 2.0;
+	  }	  
+	}
+      }
+    }
+    
+    for( u32 i = 1; i < actualWireframeSize; ++i ){
+      lvec ne;
+      lunpackNormal( octree[ nodes[ i ] * OCTREE_NODE_SIZE ], ne );
+      lvnormalize( ne );
+      lvscale( ne, cubeRadii[ i ] / 3.0 );
+      lvadd( ne, cubeCenters[ i ] );
+      lvcopy( wireframeData + 6 * i, cubeCenters[ i ] );
+      lvcopy( wireframeData + 6 * i + 3, ne ); 
     }
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
@@ -344,6 +395,8 @@ int main( int argc, char* argv[] ){
 
     free( wireframeData );
     free( nodes );
+    free( cubeCenters );
+    free( cubeRadii );
 
   }
     

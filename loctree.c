@@ -68,6 +68,11 @@ void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
       ++octree[ 0 ];
   }
 }
+/* void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree, */
+/* 		 const void* params, u32 count ){ */
+  
+
+/* } */
 u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
 		   float cubeRadius, u32* octree, const void* params ){
   lvec col = { 0.0, 0.0, 0.0 };

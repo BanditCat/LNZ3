@@ -27,6 +27,18 @@ void LNZQuit( void ){
   SDL_Quit();
 }
 
+void* lmalloc( u32 size ){
+  void* ans = malloc( size );
+  if( ans == NULL ){
+    SDL_LogError( SDL_LOG_CATEGORY_APPLICATION,
+		  "\nOut of memory! Failed to allocate %i bytes!\n", size );
+    fprintf( stderr, "\nOut of memory! Failed to allocate %i bytes!\n", size );
+    exit( EXIT_FAILURE );
+  }
+  return ans;
+}
+ 
+
 void LNZInit( int fullscreen, const char* windowTitle,
 	      double windowedWidth, double windowedHeight ){
   // Initialize SDL.
@@ -183,7 +195,7 @@ GLuint LNZCompileOrDie( char* source, GLenum type ){
     free( source );
     GLint sz;
     glGetShaderiv( obj, GL_INFO_LOG_LENGTH, &sz );
-    char* msg = malloc( sz + 1 );
+    char* msg = lmalloc( sz + 1 );
     glGetShaderInfoLog( obj, sz, NULL, msg );
     msg[ sz ] = 0;
     SDL_LogError( SDL_LOG_CATEGORY_APPLICATION,
@@ -213,7 +225,7 @@ GLuint LNZLinkOrDie( u32 count, const GLuint* shaders ){
   if( suc != GL_TRUE ){
     GLint sz;
     glGetProgramiv( obj, GL_INFO_LOG_LENGTH, &sz );
-    char* msg = malloc( sz + 1 );
+    char* msg = lmalloc( sz + 1 );
     glGetProgramInfoLog( obj, sz, NULL, msg );
     msg[ sz ] = 0;
     SDL_LogError( SDL_LOG_CATEGORY_APPLICATION,

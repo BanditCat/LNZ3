@@ -64,6 +64,8 @@ SDL_Window* mainWindow;
 // The OpenGL context.
 SDL_GLContext glContext;
 
+// Allocates or dies.
+void* lmalloc( u32 size );	     
 // Initializes or dies.
 void LNZInit( int fullscreen, const char* windowTitle, 
 	      double windowedWidth, double windowedHeight );

@@ -15,6 +15,7 @@
 #define UNEXPLORED_CHILD ( (u32)-1 )
 #define FULL_CHILD ( (u32)-2 )
 #define EMPTY_CHILD ( (u32)-3 )
+#define VALID_CHILD ( (u32)-4 )
 
 // Should be 2^n + 1. 
 #define SUPERSAMPLE_DIM 5
