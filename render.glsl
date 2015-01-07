@@ -36,8 +36,8 @@ void main( void ){
     
     vec3 ray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
   
-    vec3 cubeCenter = { 20.0, 0.0, 0.0 };
-    float cubeRadius = 10;
+    vec3 cubeCenter = { 0.0, 0.0, 0.0 };
+    float cubeRadius = 100;
 
     origin = ( vec4( origin, 1.0 ) * rmv ).xyz;
     ray = normalize( ( vec4( ray, 1.0 ) * rmv ).xyz - origin );
@@ -46,7 +46,7 @@ void main( void ){
     for( i = 0;  i < 10; ++i ){
       float t = raycastOctree( origin, ray, octree, cubeCenter, cubeRadius );
       if( t > 0.0 )
-	ans = vec3( 0.0, 1.0, 0.5 ) * vec3( t / 10 );
+	ans = vec3( 0.4, 0.5, 1.0 ) * vec3( t / 100.0 );
       else
 	ans = vec3( 0.0 );
     }
@@ -57,9 +57,9 @@ void main( void ){
   }
 }
 uint pack( in vec3 ans ){
-  uint val = uint( clamp( ans.r, 0.0, 1.0 ) * 2047.0 );
-  val += uint( clamp( ans.g, 0.0, 1.0 ) * 2047.0 ) << 11;
-  val += uint( clamp( ans.b, 0.0, 1.0 ) * 1023.0 ) << 22;
+  uint val = uint( trunc( clamp( ans.r, 0.0, 1.0 ) * 2047.0 ) );
+  val += uint( trunc( clamp( ans.g, 0.0, 1.0 ) * 2047.0 ) ) << 11;
+  val += uint( trunc( clamp( ans.b, 0.0, 1.0 ) * 1023.0 ) ) << 22;
   return val;
 }
 float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 

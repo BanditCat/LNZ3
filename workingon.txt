@@ -1,1 +1,1 @@
-LNZ3.1a Octrees! Ditherings, fat pixels, text, icons.
+LNZ3.1a Octrees! text, icons.

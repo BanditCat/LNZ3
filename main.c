@@ -15,7 +15,7 @@
 
 #define OCTREE_SIZE 20000000
 
-#define WIREFRAME_SIZE 8192
+#define WIREFRAME_SIZE 65536
 
 #define FOV_MINIMUM ( pi * 0.01 )
 #define FOV_MAXIMUM ( pi * 0.99 )
@@ -68,6 +68,8 @@ void keys( const SDL_Event* ev ){
     dheight = y;
     glViewport( 0, 0, x, y );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_v ){
+    movingFov = 1;
+  } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
     movingFov = 1;
   } else if( ev->key.state == SDL_RELEASED && ev->key.keysym.sym == SDLK_v ){
     movingFov = 0;
@@ -272,8 +274,6 @@ int main( int argc, char* argv[] ){
   LNZSetMouseHandler( mice );
   LNZSetWindowHandler( wms );
 
-		
-
   u64 sz;
   GLuint shd[ 2 ];
   u8* dt = LNZLoadResourceOrDie( "render.glsl", &sz );
@@ -326,9 +326,9 @@ int main( int argc, char* argv[] ){
 		  NULL, GL_DYNAMIC_COPY );
     GLuint* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
     
-    sphereParams sp = { { 0.3, -0.5, 0.3 }, 1.4 };
+    sphereParams sp = { { -0.15, -0.2, 0.25 }, 0.5 };
     initOctree( sphere, octree, &sp );
-    growOctree( sphere, octree, &sp, 10000 );
+    growOctree( sphere, octree, &sp, 100000 );
 
 
     // Build wireframe
@@ -338,7 +338,7 @@ int main( int argc, char* argv[] ){
     float* cubeRadii = lmalloc( WIREFRAME_SIZE * sizeof( float ) );
     nodes[ 0 ] = 0;
     cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
-    cubeRadii[ 0 ] = 10.0;
+    cubeRadii[ 0 ] = 100.0;
     
     for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
       if( octree[ 2 + i ] <= VALID_CHILD ){
