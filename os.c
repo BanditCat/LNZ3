@@ -27,6 +27,8 @@ u8* LNZLoadResource( const char* name, u64* size ){
     return NULL;
   *size = SizeofResource( NULL, rsc );
   ans = lmalloc( *size + 1 );
+  if( ans == NULL )
+    return ans;
   memcpy( ans, dt, *size );
   ans[ *size ] = '\0';
   return ans;
@@ -42,3 +44,7 @@ u8* LNZLoadResourceOrDie( const char* name, u64* size ){
   }
   return ans;
 }  
+// For debugging.
+void LNZModalMessage( const char* msg ){
+  MessageBox( NULL, msg, "", 0 );
+}

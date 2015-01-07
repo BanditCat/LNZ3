@@ -92,6 +92,8 @@ void LNZSetWindowHandler( void(*)( const SDL_Event* ) );
 u8* LNZLoadResource( const char* name, u64* size );
 u8* LNZLoadResourceOrDie( const char* name, u64* size );
 
+void LNZModalMessage( const char* msg );
+
 // NOTE! This function frees source when done.
 GLuint LNZCompileOrDie( char* source, GLenum type );
 // NOTE! This function destroys the shaders when done.

@@ -326,8 +326,10 @@ int main( int argc, char* argv[] ){
 		  NULL, GL_DYNAMIC_COPY );
     GLuint* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_WRITE_ONLY );
     
-    sphereParams sp = { { 0.0, 0.2, 0.3 }, 0.5 };
+    sphereParams sp = { { 0.3, -0.5, 0.3 }, 1.4 };
     initOctree( sphere, octree, &sp );
+    growOctree( sphere, octree, &sp, 10000 );
+
 
     // Build wireframe
     GLfloat* wireframeData = lmalloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
@@ -338,7 +340,6 @@ int main( int argc, char* argv[] ){
     cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
     cubeRadii[ 0 ] = 10.0;
     
-
     for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
       if( octree[ 2 + i ] <= VALID_CHILD ){
 	nodes[ actualWireframeSize ] = octree[ 2 + i ];
@@ -351,43 +352,46 @@ int main( int argc, char* argv[] ){
 	cubeRadii[ actualWireframeSize++ ] = cubeRadii[ 0 ] / 2.0;
       }	  
     }
+
     u32 oldsize = actualWireframeSize - 1;
     while( oldsize != actualWireframeSize &&
-	   actualWireframeSize < WIREFRAME_SIZE ){ 
+    	   actualWireframeSize < WIREFRAME_SIZE ){
       oldsize = actualWireframeSize;
-      for( u32 cur = actualWireframeSize - 1; 
-	   cubeRadii[ cur ] == cubeRadii[ cur - 1 ] && 
-	     actualWireframeSize < WIREFRAME_SIZE; 
-	   --cur ){
-	for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
-	  if( octree[ cur * OCTREE_NODE_SIZE + 2 + i ] <= VALID_CHILD ){
-	    nodes[ actualWireframeSize ] = octree[ cur * OCTREE_NODE_SIZE +
-						   2 + i ];
-	    lvec cc, ad;
-	    lvcopy( cc, cubeCenters[ cur ] );
-	    lvcopy( ad, cubeVecs[ i ] );
-	    lvscale( ad, cubeRadii[ cur ] / 2.0 );
-	    lvadd( cc, ad );
-	    lvcopy( cubeCenters[ actualWireframeSize ], cc );
-	    cubeRadii[ actualWireframeSize++ ] = cubeRadii[ cur ] / 2.0;
-	  }	  
-	}
+      for( u32 cur = actualWireframeSize - 1;
+    	   ( cur == actualWireframeSize - 1 ||
+	     cubeRadii[ cur ] == cubeRadii[ cur + 1 ] ) &&
+    	     actualWireframeSize < WIREFRAME_SIZE;
+    	   --cur ){
+    	for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
+	  u32 nn = octree[ nodes[ cur ] * OCTREE_NODE_SIZE + 2 + i ];
+    	  if( nn <= VALID_CHILD ){
+	    nodes[ actualWireframeSize ] = nn;
+    	    lvec cc, ad;
+    	    lvcopy( cc, cubeCenters[ cur ] );
+    	    lvcopy( ad, cubeVecs[ i ] );
+    	    lvscale( ad, cubeRadii[ cur ] / 2.0 );
+    	    lvadd( cc, ad );
+    	    lvcopy( cubeCenters[ actualWireframeSize ], cc );
+    	    cubeRadii[ actualWireframeSize++ ] = cubeRadii[ cur ] / 2.0;
+    	  }
+    	}
       }
     }
-    
+
+
+
     for( u32 i = 1; i < actualWireframeSize; ++i ){
       lvec ne;
       lunpackNormal( octree[ nodes[ i ] * OCTREE_NODE_SIZE ], ne );
       lvnormalize( ne );
-      lvscale( ne, cubeRadii[ i ] / 3.0 );
+      lvscale( ne, cubeRadii[ i ] / 1.5 );
       lvadd( ne, cubeCenters[ i ] );
       lvcopy( wireframeData + 6 * i, cubeCenters[ i ] );
       lvcopy( wireframeData + 6 * i + 3, ne ); 
     }
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
-  
-  
+    
     glGenBuffers( 1, &wireframeBuffer );
     glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
     glBufferData( GL_ARRAY_BUFFER, actualWireframeSize * 6 * sizeof( GLfloat ), 
