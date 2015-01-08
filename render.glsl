@@ -28,8 +28,6 @@ void main( void ){
   if( index < gcount ){
     vec3 ans;
     
-  
- 
     vec3 origin = { 0, 0, 0 };
     float x = ( float( index % uint( screen.x ) ) / ( screen.x - 1.0 ) ) * 2.0 - 1.0;
     float y = ( float( index / uint( screen.x ) ) / ( screen.y - 1.0 ) ) * 2.0 - 1.0;
