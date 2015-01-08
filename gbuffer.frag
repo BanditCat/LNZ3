@@ -40,7 +40,7 @@ vec3 unpack( in uint v ){
   vec3 ans;
   ans.r = float( ( v >> 0 ) & 2047 ) / 2047.0;
   ans.g = float( ( v >> 11 ) & 2047 ) / 2047.0;
-  ans.b = float( ( v >> 22 ) & 1023 ) / 1027.0;
+  ans.b = float( ( v >> 22 ) & 1023 ) / 1023.0;
 
   return ans;
 }

@@ -342,7 +342,6 @@ int main( int argc, char* argv[] ){
     growOctree( sphere, octree, &sphr, OCTREE_INITIAL_SIZE );
     glUnmapBuffer( GL_ARRAY_BUFFER );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
-
       
     // Build wireframe
     actualWireframeSize = buildWireframe( &wireframeBuffer, buffers[ 2 ] );
