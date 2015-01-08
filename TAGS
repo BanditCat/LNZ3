@@ -9,18 +9,18 @@ void lmscale(15,419
 void lmbasis(16,453
 void lmmult(17,508
 void lmprojection(18,541
-void lmtranslate(19,575
-void lmtranspose(20,607
-void lminvert(21,633
-void lmlogMatrix(22,656
-void lvcopy(24,691
-void lvcross(25,724
-void lvscale(26,758
-void lvadd(27,787
-float lvdot(28,823
-void lvnormalize(29,862
+void lmtranslate(19,616
+void lmtranspose(20,648
+void lminvert(21,674
+void lmlogMatrix(22,697
+void lvcopy(24,732
+void lvcross(25,765
+void lvscale(26,799
+void lvadd(27,828
+float lvdot(28,864
+void lvnormalize(29,903
 
-lnz.h,882
+lnz.h,936
 #define LNZ_H8,279
 #define GLEW_STATIC12,312
 typedef unsigned char u8;18,399
@@ -37,37 +37,40 @@ typedef double f64;27,650
 SDL_DisplayMode fullscreenDM;61,1907
 SDL_Window* mainWindow;63,1957
 SDL_GLContext glContext;65,2004
-void LNZInit(68,2054
-void LNZReinit(71,2190
-void LNZOSReinit(74,2318
-void LNZQuit(76,2345
-void LNZLoop(79,2392
-void LNZSetKeyHandler(82,2484
-void LNZSetTouchHandler(83,2538
-void LNZSetMouseHandler(84,2594
-void LNZSetWindowHandler(85,2650
-u8* LNZLoadResource(90,2928
-u8* LNZLoadResourceOrDie(91,2980
-GLuint LNZCompileOrDie(94,3085
-GLuint LNZLinkOrDie(96,3193
+void* lmalloc(68,2052
+void LNZInit(70,2109
+void LNZReinit(73,2245
+void LNZOSReinit(76,2373
+void LNZQuit(78,2400
+void LNZLoop(81,2447
+void LNZSetKeyHandler(84,2539
+void LNZSetTouchHandler(85,2593
+void LNZSetMouseHandler(86,2649
+void LNZSetWindowHandler(87,2705
+u8* LNZLoadResource(92,2983
+u8* LNZLoadResourceOrDie(93,3035
+void LNZModalMessage(95,3093
+GLuint LNZCompileOrDie(98,3182
+GLuint LNZLinkOrDie(100,3290
 
-loctree.h,450
+loctree.h,480
 #define LOCTREE_H8,295
-#define OCTREE_NODE_SIZE 11,393
-#define MAX_OCTREE_DEPTH 13,452
-#define UNEXPLORED_CHILD 15,482
-#define FULL_CHILD 16,519
-#define EMPTY_CHILD 17,550
-#define SUPERSAMPLE_DIM 20,606
-#define SUPERSAMPLES 21,632
-static const lvec cubeVecs[cubeVecs23,658
-u32 lpack(33,904
-void lunpack(34,931
-u32 lpackNormal(35,964
-void lunpackNormal(36,997
-void initOctree(41,1190
-void growOctree(43,1288
-u32 calculateNode(46,1447
+#define OCTREE_NODE_SIZE 12,395
+#define MAX_OCTREE_DEPTH 14,454
+#define UNEXPLORED_CHILD 16,486
+#define FULL_CHILD 17,523
+#define EMPTY_CHILD 18,554
+#define VALID_CHILD 19,586
+#define SUPERSAMPLE_DIM 22,642
+#define SUPERSAMPLES 23,668
+static const lvec cubeVecs[cubeVecs25,694
+u32 lpack(35,940
+void lunpack(36,967
+u32 lpackNormal(37,1000
+void lunpackNormal(38,1033
+void initOctree(43,1226
+void growOctree(45,1324
+u32 calculateNode(48,1483
 
 lshapes.h,111
 #define LSHAPES_H9,365
@@ -81,75 +84,88 @@ void lmidentity(7,262
 void lmcopy(15,427
 void lmscale(19,527
 void lmbasis(32,795
-void lmprojection(48,1296
-void lmtranslate(63,1628
-void lmmult(76,1894
-void lmtranspose(89,2190
-void lmlogMatrix(96,2351
-void lvcopy(106,2784
-void lvadd(111,2876
-void lvscale(115,2967
-void lvcross(119,3050
-void lvnormalize(125,3267
-float lvdot(130,3380
-float Determinant(141,3661
-void CoFactor(183,4552
-void lminvert(223,5393
+void lmprojection(49,1297
+void lmtranslate(64,1722
+void lmmult(77,1988
+void lmtranspose(90,2284
+void lmlogMatrix(97,2445
+void lvcopy(107,2878
+void lvadd(112,2970
+void lvscale(116,3061
+void lvcross(120,3144
+void lvnormalize(126,3361
+float lvdot(131,3474
+float Determinant(142,3755
+void CoFactor(184,4648
+void lminvert(224,5491
 
-lnz.c,386
+lnz.c,409
 SDL_DisplayMode fullscreenDM 9,365
 SDL_Window* mainWindow 11,423
 SDL_GLContext glContext 13,477
 void LNZQuit(22,720
-void LNZInit(30,888
-void LNZReinit(60,1835
-void LNZLoop(133,4178
-void LNZSetKeyHandler(157,5034
-void LNZSetTouchHandler(160,5115
-void LNZSetMouseHandler(163,5200
-void LNZSetWindowHandler(166,5285
-GLuint LNZCompileOrDie(170,5375
-GLuint LNZLinkOrDie(199,6184
+void* lmalloc(30,888
+void LNZInit(42,1206
+void LNZReinit(72,2153
+void LNZLoop(145,4496
+void LNZSetKeyHandler(169,5352
+void LNZSetTouchHandler(172,5433
+void LNZSetMouseHandler(175,5518
+void LNZSetWindowHandler(178,5603
+GLuint LNZCompileOrDie(182,5693
+GLuint LNZLinkOrDie(211,6503
 
-loctree.c,142
+loctree.c,168
 u32 lpack(8,280
 void lunpack(26,638
 u32 lpackNormal(32,811
 void lunpackNormal(50,1188
 void initOctree(58,1431
-u32 calculateNode(71,1891
+void growOctree(69,1777
+u32 calculateNode(126,3338
 
 lshapes.c,18
 int sphere(7,262
 
-main.c,561
+main.c,840
 #define COMPUTE_GROUP_SIZE 10,320
 #define GBUFFER_WIDTH 12,353
 #define GBUFFER_HEIGHT 13,394
 #define GBUFFER_SIZE 14,436
 #define OCTREE_SIZE 16,493
-#define WIREFRAME_SIZE 18,523
-int movingWindow 21,553
-int wireframe 22,575
-int fullscreen 23,594
-int dwidth,24,614
-int dwidth, dheight;24,614
-int pixelSize 25,635
-float sfps 27,673
-float rotx 28,692
-int rel 29,740
-int blowup 30,753
-float scale 31,769
-lvec trns 32,786
-u64 disableMouseTime 33,812
-void keys(35,839
-void touches(89,2562
-void wms(157,4706
-void mice(164,4902
-int main(219,6401
+#define OCTREE_INITIAL_SIZE 17,522
+#define OCTREE_INCREMENTAL_SIZE 18,557
+#define WIREFRAME_SIZE 19,596
+#define FOV_MINIMUM 21,626
+#define FOV_MAXIMUM 22,660
+GLuint buildWireframe(26,768
+int movingWindow 28,810
+int movingFov 29,832
+float fov 30,851
+int wireframe 32,874
+int fullscreen 33,893
+int dwidth,34,913
+int dwidth, dheight;34,913
+int pixelSize 35,934
+int grow 36,953
+float sfps 39,987
+float rotx 40,1006
+int rel 41,1054
+int blowup 42,1067
+float scale 43,1083
+lvec trns 44,1100
+u64 disableMouseTime 45,1126
+void quit(47,1153
+void keys(50,1198
+void touches(110,3191
+void wms(204,6629
+void mice(211,6825
+int main(272,8490
+GLuint buildWireframe(500,15306
 
-os.c,120
+os.c,150
 #define WIN32_LEAN_AND_MEAN6,284
 void LNZOSReinit(15,429
 u8* LNZLoadResource(18,490
-u8* LNZLoadResourceOrDie(35,934
+u8* LNZLoadResourceOrDie(37,971
+void LNZModalMessage(48,1257

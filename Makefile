@@ -56,7 +56,7 @@ release: PACK:=upx --best $(TARGET)
 
 .PHONY: debug 
 debug: $(TARGET)
-debug: CCFLAGS:=$(TARGETDEFINE) -DDEBUG $(CCFLAGS)
+debug: CCFLAGS:=$(TARGETDEFINE) -ggdb -DDEBUG $(CCFLAGS)
 
 
 .PHONY: clean
