@@ -72,12 +72,11 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
   u32 nodes[ MAX_OCTREE_DEPTH ];
   lvec cubeCenters[ MAX_OCTREE_DEPTH ];
   float cubeRadii[ MAX_OCTREE_DEPTH ];
-  u32 sels[ MAX_OCTREE_DEPTH ];
+  u32 sels[ MAX_OCTREE_DEPTH ] = { 0 };
   u32 calced = 0;
   nodes[ 0 ] = 0;
   cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
   cubeRadii[ 0 ] = 1.0;
-  sels[ 0 ] = 0;
 
 
  
@@ -96,7 +95,7 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
     
     s32 ulvl = level;
     do{
-      while( sels[ ulvl ] == 7 && ulvl >= 0 )
+      while( ulvl >= 0 && sels[ ulvl ] >= 7 )
 	sels[ ulvl-- ] = 0;
       if( ulvl < 0 ){
 	ulvl = 0;
