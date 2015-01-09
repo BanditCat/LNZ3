@@ -1,1 +1,1 @@
-Raycasting!
+Simplifying octree shader.

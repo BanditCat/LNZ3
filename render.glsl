@@ -18,9 +18,24 @@ uniform float fov;
 
 float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
 		   in float cubeRadius );
-float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
-		     in vec3 cubeCenter, in float cubeRadius );
+
 uint pack( in vec3 ans );
+vec3 unpack( in uint v );
+vec3 unpackNormal( uint v );
+
+const uint octreeNodeSize = 16;
+const uint maxCount = 1;
+const uint unexplored = 4294967295u;
+const uint valid = 4294967292u;
+const vec3 cubeVecs[ 8 ] = 
+  { { -1.0, -1.0, -1.0 },
+    {  1.0, -1.0, -1.0 },
+    { -1.0,  1.0, -1.0 },
+    {  1.0,  1.0, -1.0 },
+    { -1.0, -1.0,  1.0 },
+    {  1.0, -1.0,  1.0 },
+    { -1.0,  1.0,  1.0 },
+    {  1.0,  1.0,  1.0 } };
 
 void main( void ){ 
   uint index = uint( gl_GlobalInvocationID.x );
@@ -39,19 +54,18 @@ void main( void ){
 
     origin = ( vec4( origin, 1.0 ) * rmv ).xyz;
     ray = normalize( ( vec4( ray, 1.0 ) * rmv ).xyz - origin );
-    vec3 col;
+  
     uint i;
-    for( i = 0;  i < 10; ++i ){
-      float t = raycastOctree( origin, ray, octree, cubeCenter, cubeRadius );
-      if( t > 0.0 )
-	ans = vec3( 0.4, 0.5, 1.0 ) * vec3( t / 100.0 );
-      else
-	ans = vec3( 0.0 );
-    }
-    
-    
-    imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
+    {
+      uint node = 0;
+      
+      
 
+      ans = raycastCube( origin, ray, cubeCenter, cubeRadius ) * 
+	vec3( 0.2, 1.0, 0.6 ) / 100.0;
+      
+    }
+    imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
 }
 uint pack( in vec3 ans ){
@@ -78,40 +92,22 @@ float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   return 0.0;
 }
 
-uniform uint octreeSize = 10;
-uniform uint octreeNormal = 0;
-uniform uint octreeColor = 1;
-uniform uint octreeChildren = 2;
-uniform uint maxCount = 16;
 
-float raycastOctree( in vec3 origin, in vec3 ray, uimageBuffer octree, 
-		     in vec3 cubeCenter, in float cubeRadius ){
-  uint top = 0;
-  uint nodes[ 128 ];
-  vec3 centers[ 128 ];
-  float radii[ 128 ];
-  float tvalues[ 128 ];
-  
-  tvalues[ 0 ] = raycastCube( origin, ray, cubeCenter, cubeRadius );
-  if( tvalues[ 0 ] <= 0.0 )
-    return 0.0;
- 
-  return tvalues[ 0 ];
- 
-  nodes[ 0 ] = 0;
-  centers[ 0 ] = cubeCenter;
-  radii[ 0 ] = cubeRadius;
 
-  for( uint c = 0; c < maxCount; ++c ){
-    for( uint i = 0; i < 8; ++i ){
- 
-      vec3 newCenter = { ( ( i >> 0 ) & 1 ) * 2.0 - 1.0,
-			 ( ( i >> 1 ) & 1 ) * 2.0 - 1.0,
-			 ( ( i >> 2 ) & 1 ) * 2.0 - 1.0 };
-      float newRadius = cubeRadius / 2.0;
-      newCenter = newRadius * newCenter + cubeCenter;
-	  
-    }
-  }
+vec3 unpackNormal( uint ans ){
+  vec3 v;
+  v.x = ( ( ans >> 0 ) & 2047 ) / 2047.0;
+  v.y = ( ( ans >> 11 ) & 2047 ) / 2047.0;
+  v.z = ( ( ans >> 22 ) & 1023 ) / 1023.0;
+  v = v * 2.0 - 1.0;
+  return v;
+}
+
+vec3 unpack( uint ans ){
+  vec3 v;
+  v.x = ( ( ans >> 0 ) & 2047 ) / 2047.0;
+  v.y = ( ( ans >> 11 ) & 2047 ) / 2047.0;
+  v.z = ( ( ans >> 22 ) & 1023 ) / 1023.0;
+  return v;
 }
 

@@ -1,1 +1,1 @@
-LNZ3.1a Growing octrees and wirframes.
+LNZ3.1a Rendering octrees. Fatening them to 16 words.

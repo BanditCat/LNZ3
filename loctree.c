@@ -5,7 +5,7 @@
 #include "lnz.h"
 #include <math.h>
 
-u32 lpack( const lvec v ){
+u32 lpackColor( const lvec v ){
   u32 val;
   lvec ans;
   for( u32 i = 0; i < 3; ++i ){
@@ -55,15 +55,42 @@ void lunpackNormal( u32 ans, lvec v ){
     v[ i ] = v[ i ] * 2.0 - 1.0;
 }
 
+u32 lpackFloat( float v ){
+  v = v * 0.5 + 0.5;
+  v = v * 4294967296.0;
+  return trunc( v );
+}
+float lunpackFloat( u32 u ){
+  float v = u;
+  v /= 4294967296.0;
+  v = v * 2.0 - 1.0;
+  return v;
+}
+u32 lpackRadius( float v ){
+  return 0 - log2( v );
+}
+float lunpackRadius( u32 u ){
+  return pow( 2.0, 0.0 - (float)u );
+}
+
 void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 		 const void* params ){
   octree[ OCTREE_NODE_SIZE * 0 ] = 1;  
+  {
+    lvec col = { 0.0, 0.0, 0.0 };
+    octree[ 1 ] = lpackColor( col );
+  }
+  octree[ 10 ] = octree[ 11 ] = octree[ 12 ] = lpackFloat( 0.0 );
+  octree[ 13 ] = lpackRadius( 1.0 );
+  octree[ 14 ] = INVALID;
+  octree[ 15 ] = 0;
+  
   for( u32 i = 0; i < 8; ++i ){
     lvec cc;
     lvcopy( cc, cubeVecs[ i ] );
     lvscale( cc, 0.5 );
     octree[ OCTREE_NODE_SIZE * 0 + 2 + i ] =
-      calculateNode( inside, cc, 0.5, octree, params );
+      calculateNode( inside, cc, 0.5, octree, params, 0, i );
   }
 }
 void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
@@ -88,7 +115,8 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 	lvscale( cc, cubeRadii[ level ] * 0.5 );
 	lvadd( cc, cubeCenters[ level ] );
 	octree[ nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ] = 
-	  calculateNode( inside, cc, cubeRadii[ level ] * 0.5, octree, params );
+	  calculateNode( inside, cc, cubeRadii[ level ] * 0.5, octree, params,
+			 nodes[ level ], i );
 	++calced;
       }
     }
@@ -123,7 +151,7 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
   }
 }
 u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
-		   float cubeRadius, u32* octree, const void* params ){
+		   float cubeRadius, u32* octree, const void* params, u32 parent, u32 child ){
   lvec col = { 0.0, 0.0, 0.0 };
   lvec normal = { 0.0, 0.0, 0.0 };
   lvec pos;
@@ -160,8 +188,14 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   lvscale( col, 1.0 / ( (float)coverage ) );
   
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 0 ] = lpackNormal( normal );
-  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 1 ] = lpack( col );
+  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 1 ] = lpackColor( col );
   for( u32 i = 0; i < 8; ++i )
     octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 2 + i ] = UNEXPLORED_CHILD;
+  for( u32 i = 0; i < 3; ++i )
+    octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 10 + i ] = lpackFloat( cubeCenter[ i ] );
+  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 13 ] = lpackRadius( cubeRadius );
+  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 14 ] = parent;
+  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 15 ] = child;
+  
   return octree[ 0 ]++;
 }

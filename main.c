@@ -30,7 +30,7 @@ float fov = pi / 2.0;
 int wireframe = 0;
 int fullscreen = 0;
 int dwidth, dheight;
-int pixelSize = 2;
+int pixelSize = 4;
 int grow = 0;
 
 // Amortized time.
@@ -340,6 +340,7 @@ int main( int argc, char* argv[] ){
 
     initOctree( sphere, octree, &sphr );
     growOctree( sphere, octree, &sphr, OCTREE_INITIAL_SIZE );
+
     glUnmapBuffer( GL_ARRAY_BUFFER );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
       
@@ -444,8 +445,8 @@ int main( int argc, char* argv[] ){
     glUseProgram( prg );
     glBindImageTexture( 0, texs[ nbsel ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
-    /* glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0, */
-    /* 			  GL_READ_ONLY, GL_R32UI ); */
+    glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0,
+    			  GL_READ_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
@@ -455,6 +456,7 @@ int main( int argc, char* argv[] ){
     
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
 		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
+
     
     // Render quad.
     glUseProgram( bprg );
