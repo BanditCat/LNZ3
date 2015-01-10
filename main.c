@@ -14,8 +14,8 @@
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 20000000
-#define OCTREE_INITIAL_SIZE 100
-#define OCTREE_INCREMENTAL_SIZE 1000
+#define OCTREE_INITIAL_SIZE 200
+#define OCTREE_INCREMENTAL_SIZE 100
 #define WIREFRAME_SIZE 65536
 
 #define FOV_MINIMUM ( pi * 0.01 )
@@ -78,7 +78,10 @@ void keys( const SDL_Event* ev ){
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_v ){
     movingFov = 1;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
-    grow = 1;
+    if( grow )
+      grow = 0;
+    else
+      grow = 1;
   } else if( ev->key.state == SDL_RELEASED && ev->key.keysym.sym == SDLK_v ){
     movingFov = 0;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_SPACE ){
@@ -331,7 +334,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandlebrotParams mndlb = { { 0.010, 0.01, 0.01 }, 5.5, 1024 };
+  static const mandlebrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 5.5, 256 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -413,7 +416,6 @@ int main( int argc, char* argv[] ){
     
     // Grow octree maybe.
     if( grow ){
-      grow = 0;     
       glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
