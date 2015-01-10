@@ -64,39 +64,52 @@ void main( void ){
       uint node = 0;
       uint sel = 0;
 
-      for( uint i = 0; i < 5; ++i ){
+      for( uint i = 0; i < 800; ++i ){
 
 	uint asel = 0;
-	if( origin.x > 0.0 )
+	if( origin.x - cubeCenter.x > 0.0 )
 	  asel = asel + 1;
-	if( origin.y > 0.0 )
+	if( origin.y - cubeCenter.y > 0.0 )
 	  asel = asel + 2;
-	if( origin.z > 0.0 )
+	if( origin.z - cubeCenter.z > 0.0 )
 	  asel = asel + 4;
 
-	uint addr = imageLoad( octree, 
-			       int( node * octreeNodeSize + 2 + ( sel ^ asel ) ) ).x;
-	if( addr == unexplored )
-	  break;
-	else if( addr <= valid ){
-	  
-	  vec3 cc;
-	  cc.x = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 10)).x);
-	  cc.y = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 11)).x);
-	  cc.z = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 12)).x);
-	  float r = unpackRadius( imageLoad( octree, 
-				  int( addr * octreeNodeSize + 13 ) ).x );
-	  float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
-	  if( t != 0.0 && tval == 0 ){
-	    tval = t;
-	  }
-	} 
-	sel = sel + 1;
+
 	if( sel == 8 ){
+	  if( node == 0 ){
+	    tval = 0.0;
+	    break;
+	  }
+	  sel = (asel ^ ( imageLoad( octree, int( node * octreeNodeSize + 15)).x ));
+	  node = imageLoad( octree, int( node * octreeNodeSize + 14)).x;
+	} else{	    
+
+	  uint addr = imageLoad( octree, 
+				 int( node * octreeNodeSize + 2 + ( sel ^ asel ) ) ).x;
+	  if( addr == unexplored )
+	    break;
+	  else if( addr <= valid ){
 	  
-	}	    
+	    vec3 cc;
+	    cc.x = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 10)).x);
+	    cc.y = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 11)).x);
+	    cc.z = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 12)).x);
+	    float r = unpackRadius( imageLoad( octree, 
+					       int( addr * octreeNodeSize + 13 ) ).x );
+	    float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
+	    if( t > 0.0 ){
+	      node = addr;
+	      cubeCenter = cc;
+	      tval = t;
+	      sel = 0;
+	      continue;
+	    }
+	  }
+	}
+	sel = sel + 1;
       }
     }
+
     ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100.0;
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
