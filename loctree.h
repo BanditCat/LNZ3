@@ -22,7 +22,7 @@
 
 // Should be 2^n + 1. 
 #define SUPERSAMPLE_DIM 5
-#define SUPERSAMPLES 125
+#define SUPERSAMPLES ( SUPERSAMPLE_DIM * SUPERSAMPLE_DIM * SUPERSAMPLE_DIM )
 
 static const lvec cubeVecs[ 8 ] = 
   { { -1.0, -1.0, -1.0 },

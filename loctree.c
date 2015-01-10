@@ -57,12 +57,11 @@ void lunpackNormal( u32 ans, lvec v ){
 
 u32 lpackFloat( float v ){
   v = v * 0.5 + 0.5;
-  v = v * 4294967296.0;
-  return trunc( v );
+  v *= 4294967296;
+  return v;
 }
 float lunpackFloat( u32 u ){
-  float v = u;
-  v /= 4294967296.0;
+  float v = (float)u / 4294967296.0;
   v = v * 2.0 - 1.0;
   return v;
 }

@@ -13,9 +13,9 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 2000000
-#define OCTREE_INITIAL_SIZE 256
-#define OCTREE_INCREMENTAL_SIZE 1024
+#define OCTREE_SIZE 20000000
+#define OCTREE_INITIAL_SIZE 1000
+#define OCTREE_INCREMENTAL_SIZE 10000
 #define WIREFRAME_SIZE 65536
 
 #define FOV_MINIMUM ( pi * 0.01 )
@@ -268,7 +268,7 @@ void mice( const SDL_Event* ev ){
     
 
 int main( int argc, char* argv[] ){
-  (void)(argc);(void)(argv);
+ (void)(argc);(void)(argv);
 
   srand( SDL_GetPerformanceCounter() );
 
@@ -331,15 +331,15 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const sphereParams sphr = { { -0.15, -0.2, 0.25 }, 0.5 };
+  static const mandlebrotParams mndlb = { { 0.0, 0.0, 0.0 }, 2.0, 16 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_DYNAMIC_DRAW );
     u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
 
-    initOctree( sphere, octree, &sphr );
-    growOctree( sphere, octree, &sphr, OCTREE_INITIAL_SIZE );
+    initOctree( mandelbrot, octree, &mndlb );
+    growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -385,6 +385,7 @@ int main( int argc, char* argv[] ){
   GLuint screenloc = glGetUniformLocation( prg, "screen" );
   GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
   GLuint fovloc = glGetUniformLocation( prg, "fov" );
+  GLuint lightloc = glGetUniformLocation( prg, "light" );
   int bsel = 0, nbsel = 1;
 
   while( 1 ){
@@ -415,7 +416,7 @@ int main( int argc, char* argv[] ){
       grow = 0;     
       glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( sphere, octree, &sphr, OCTREE_INCREMENTAL_SIZE );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ARRAY_BUFFER );
       glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
@@ -453,7 +454,11 @@ int main( int argc, char* argv[] ){
 		 pixelSize, aspect );
     glUniform1f( fovloc, fov );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
-    
+
+    {
+      lvec lght = { 20.0, 40.0, -10.0 };
+      glUniform3f( lightloc, lght[ 0 ], lght[ 1 ], lght[ 2 ] );
+    }
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
 		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
 
