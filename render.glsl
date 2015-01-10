@@ -60,19 +60,22 @@ void main( void ){
 
 
   
-    {
-      uint asel = 0;
-      if( origin.x > 0.0 )
-	asel = asel + 1;
-      if( origin.y > 0.0 )
-	asel = asel + 2;
-      if( origin.z > 0.0 )
-	asel = asel + 4;
+    {      
       uint node = 0;
       uint sel = 0;
-      
+
       for( uint i = 0; i < 5; ++i ){
-	uint addr = imageLoad( octree, int( node * octreeNodeSize + 2 + (sel ^ asel) )).x;
+
+	uint asel = 0;
+	if( origin.x > 0.0 )
+	  asel = asel + 1;
+	if( origin.y > 0.0 )
+	  asel = asel + 2;
+	if( origin.z > 0.0 )
+	  asel = asel + 4;
+
+	uint addr = imageLoad( octree, 
+			       int( node * octreeNodeSize + 2 + ( sel ^ asel ) ) ).x;
 	if( addr == unexplored )
 	  break;
 	else if( addr <= valid ){
@@ -84,12 +87,14 @@ void main( void ){
 	  float r = unpackRadius( imageLoad( octree, 
 				  int( addr * octreeNodeSize + 13 ) ).x );
 	  float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
-	  if( tval == 0.0 && t > 0.0 )
+	  if( t != 0.0 && tval == 0 ){
 	    tval = t;
+	  }
 	} 
 	sel = sel + 1;
 	if( sel == 8 ){
-	}
+	  
+	}	    
       }
     }
     ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100.0;
