@@ -507,7 +507,7 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   float* cubeRadii = lmalloc( WIREFRAME_SIZE * sizeof( float ) );
   nodes[ 0 ] = 0;
   cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
-  cubeRadii[ 0 ] = 100.0;
+  cubeRadii[ 0 ] = 20.0;
     
   for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
     if( octree[ 2 + i ] <= VALID_CHILD ){
