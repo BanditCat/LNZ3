@@ -67,11 +67,11 @@ void main( void ){
       for( uint i = 0; i < 800; ++i ){
 
 	uint asel = 0;
-	if( origin.x - cubeCenter.x > 0.0 )
+	if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
 	  asel = asel + 1;
-	if( origin.y - cubeCenter.y > 0.0 )
+	if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
 	  asel = asel + 2;
-	if( origin.z - cubeCenter.z > 0.0 )
+	if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
 	  asel = asel + 4;
 
 
@@ -80,8 +80,22 @@ void main( void ){
 	    tval = 0.0;
 	    break;
 	  }
-	  sel = (asel ^ ( imageLoad( octree, int( node * octreeNodeSize + 15)).x ));
+	  sel = imageLoad( octree, int( node * octreeNodeSize + 15) ).x;
 	  node = imageLoad( octree, int( node * octreeNodeSize + 14)).x;
+	  cubeCenter.x = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 10)).x);
+	  cubeCenter.y = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 11)).x);
+	  cubeCenter.z = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 12)).x);
+	  asel = 0;
+	  if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
+	    asel = asel + 1;
+	  if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
+	    asel = asel + 2;
+	  if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
+	    asel = asel + 4;
+	  
+	  sel = ( ( sel ^ asel) + 1 );
+	  continue;
+
 	} else{	    
 
 	  uint addr = imageLoad( octree, 
@@ -110,7 +124,7 @@ void main( void ){
       }
     }
 
-    ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100.0;
+    ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100`.0;
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
 }
