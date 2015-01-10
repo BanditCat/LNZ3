@@ -124,7 +124,7 @@ void main( void ){
       }
     }
 
-    ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100`.0;
+    ans = tval * vec3( 0.2, 1.0, 0.6 ) / 100.0;
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
 }
