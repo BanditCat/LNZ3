@@ -19,6 +19,7 @@ LDFLAGS=-Lglew -lz -lglew32 -lSDL2_test -lmingw32 -lSDL2main -lSDL2 -lopengl32 -
 TARGET=lnz.exe
 TARGETDEFINE=-DWINDOWS
 OBJS:=$(OBJS) windowsResource.o
+STATE:=octree
 
 # Actual build rules.
 # These are supposed everything that might be edited.
@@ -28,6 +29,7 @@ SHDRS:=$(SHDRS) $(wildcard ./*.glsl) $(wildcard ./*.vert) $(wildcard ./*.frag)
 CS:=$(CS) $(wildcard ./*.c)
 OBJS:=$(OBJS) $(CS:.c=.o)
 $(OBJS): Makefile
+
 include deps
 
 # windres
@@ -61,7 +63,7 @@ debug: CCFLAGS:=$(TARGETDEFINE) -ggdb -DDEBUG $(CCFLAGS)
 
 .PHONY: clean
 clean:
-	rm -f ./*.o ./$(TARGET)
+	rm -f ./*.o ./$(TARGET) ./$(STATE)
 
 .PHONY: backup
 backup: clean release
