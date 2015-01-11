@@ -51,7 +51,7 @@ void quit( void ){
   u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
   
   u32 sz = octree[ 0 ] * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
-    
+  
   gzFile out = gzopen( "octree", "w" );
   int len = 1;
   if( out == NULL )
@@ -60,6 +60,9 @@ void quit( void ){
     len = gzwrite( out, octree, sz );
   if( len == 0 )
     LNZModalMessage( "Failed to write!" );
+  
+  SDL_Log( "Compressed %u to %u bytes, %u out of %u octree nodes used.",
+	   sz, len, octree[ 0 ], OCTREE_SIZE );
   if( out != NULL )
     gzclose( out );
   
@@ -355,7 +358,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 3.0, 256 };
+  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 3.0, 16 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
