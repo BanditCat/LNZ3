@@ -179,7 +179,7 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
 		   float cubeRadius, u32* octree, const void* params, u32 parent, u32 child ){
   lvec col = { 0.0, 0.0, 0.0 };
   lvec normal = { 0.0, 0.0, 0.0 };
-  lvec pos;
+  lvec pos = { 0.0, 0.0, 0.0 };
   u32 coverage = 0;
   for( pos[ 0 ] = cubeCenter[ 0 ] - cubeRadius; 
        pos[ 0 ] <= cubeCenter[ 0 ] + cubeRadius;

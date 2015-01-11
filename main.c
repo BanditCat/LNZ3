@@ -362,7 +362,7 @@ int main( int argc, char* argv[] ){
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
-		  NULL, GL_DYNAMIC_DRAW );
+		  NULL, GL_STATIC_DRAW );
     u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
     octree[ 0 ] = 0;
     gzFile in = gzopen( "octree", "r" );
