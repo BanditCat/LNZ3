@@ -107,7 +107,7 @@ void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
   }
   octree[ 10 ] = octree[ 11 ] = octree[ 12 ] = lpackFloat( 0.0 );
   octree[ 13 ] = lpackRadius( 1.0 );
-  octree[ 14 ] = INVALID;
+  octree[ 14 ] = 0;
   octree[ 15 ] = 0;
   
   for( u32 i = 0; i < 8; ++i ){
