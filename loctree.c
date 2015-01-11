@@ -121,9 +121,9 @@ void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 		 const void* params, u32 count ){
   u32 level = 0;
-  u32 nodes[ MAX_OCTREE_DEPTH ];
-  lvec cubeCenters[ MAX_OCTREE_DEPTH ];
-  float cubeRadii[ MAX_OCTREE_DEPTH ];
+  u32 nodes[ MAX_OCTREE_DEPTH ] = { 0 };
+  lvec cubeCenters[ MAX_OCTREE_DEPTH ] = { { 0, 0, 0 } };
+  float cubeRadii[ MAX_OCTREE_DEPTH ] = { 0 };
   u32 sels[ MAX_OCTREE_DEPTH ] = { 0 };
   u32 calced = 0;
   nodes[ 0 ] = 0;
