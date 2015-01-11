@@ -14,8 +14,8 @@
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 20000000
-#define OCTREE_INITIAL_SIZE 200
-#define OCTREE_INCREMENTAL_SIZE 100
+#define OCTREE_INITIAL_SIZE 1000
+#define OCTREE_INCREMENTAL_SIZE 500
 #define WIREFRAME_SIZE 65536
 
 #define FOV_MINIMUM ( pi * 0.01 )
@@ -42,7 +42,21 @@ float scale = 1;
 lvec trns = { 0, 0, 90 };
 u64 disableMouseTime = 0;
 
+// 0 and 1 are gbuffers, 2 is the octree.
+GLuint buffers[ 3 ], texs[ 3 ];
+ 
+
 void quit( void ){
+  {
+    char msg[ 65536 ];
+    glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
+    u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+    
+    
+     sprintf( msg, "Octree byte size: %u", octree[ 0 ] );
+    glUnmapBuffer( GL_ARRAY_BUFFER );
+    LNZModalMessage( msg );
+  }
   exit( EXIT_SUCCESS );
 }
 void keys( const SDL_Event* ev ){ 
@@ -271,7 +285,16 @@ void mice( const SDL_Event* ev ){
     
 
 int main( int argc, char* argv[] ){
- (void)(argc);(void)(argv);
+  (void)(argc);(void)(argv);
+  {
+    for( u32 i = 0; i < 10; ++i ){
+      float r = 0.0;//(float)rand() / (float)RAND_MAX * 50.0 - 25.0;
+     
+      
+      if( r != lunpackFloat( lpackFloat( r ) ) )
+	LNZModalMessage( "foof" );
+    }
+  }
 
   srand( SDL_GetPerformanceCounter() );
 
@@ -318,8 +341,6 @@ int main( int argc, char* argv[] ){
   glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
 
-  // 0 and 1 are gbuffers, 2 is the octree.
-  GLuint buffers[ 3 ], texs[ 3 ];
   
 
   glGenBuffers( 3, buffers );
@@ -334,15 +355,15 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandlebrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 5.5, 256 };
+  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 0.8, 256 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_DYNAMIC_DRAW );
     u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
 
-    initOctree( mandelbrot, octree, &mndlb );
-    growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
+    initOctree( sphere, octree, &mndlb );
+    growOctree( sphere, octree, &mndlb, OCTREE_INITIAL_SIZE );
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -418,7 +439,7 @@ int main( int argc, char* argv[] ){
     if( grow ){
       glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+      growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ARRAY_BUFFER );
       glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
@@ -449,7 +470,7 @@ int main( int argc, char* argv[] ){
     glBindImageTexture( 0, texs[ nbsel ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
     glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0,
-    			  GL_READ_ONLY, GL_R32UI );
+			GL_READ_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,

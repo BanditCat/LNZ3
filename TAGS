@@ -53,31 +53,41 @@ void LNZModalMessage(95,3093
 GLuint LNZCompileOrDie(98,3182
 GLuint LNZLinkOrDie(100,3290
 
-loctree.h,480
+loctree.h,617
 #define LOCTREE_H8,295
-#define OCTREE_NODE_SIZE 12,395
-#define MAX_OCTREE_DEPTH 14,454
-#define UNEXPLORED_CHILD 16,486
-#define FULL_CHILD 17,523
-#define EMPTY_CHILD 18,554
-#define VALID_CHILD 19,586
-#define SUPERSAMPLE_DIM 22,642
-#define SUPERSAMPLES 23,668
-static const lvec cubeVecs[cubeVecs25,694
-u32 lpack(35,940
-void lunpack(36,967
-u32 lpackNormal(37,1000
-void lunpackNormal(38,1033
-void initOctree(43,1226
-void growOctree(45,1324
-u32 calculateNode(48,1483
+#define OCTREE_NODE_SIZE 13,464
+#define MAX_OCTREE_DEPTH 15,523
+#define INVALID 17,552
+#define UNEXPLORED_CHILD 18,583
+#define FULL_CHILD 19,623
+#define EMPTY_CHILD 20,657
+#define VALID_CHILD 21,692
+#define SUPERSAMPLE_DIM 24,751
+#define SUPERSAMPLES 25,777
+static const lvec cubeVecs[cubeVecs27,855
+u32 lpackColor(37,1101
+void lunpack(38,1133
+u32 lpackNormal(39,1166
+void lunpackNormal(40,1199
+u32 lpackFloat(42,1279
+float lunpackFloat(43,1306
+u32 lpackRadius(44,1335
+float lunpackRadius(45,1363
+void initOctree(49,1546
+void growOctree(51,1644
+u32 calculateNode(54,1803
 
-lshapes.h,111
+lshapes.h,230
 #define LSHAPES_H9,365
-  lvec center;12,401
-  float radius;13,416
-} sphereParams;14,432
-int sphere(16,449
+  lvec center;12,400
+  float radius;13,415
+} sphereParams;14,431
+int sphere(15,447
+  lvec center;18,508
+  float scale;19,523
+  u32 iterations;20,538
+} mandelbrotParams;21,556
+int mandelbrot(22,576
 
 lmat.c,425
 void lmidentity(7,262
@@ -115,53 +125,60 @@ void LNZSetWindowHandler(178,5603
 GLuint LNZCompileOrDie(182,5693
 GLuint LNZLinkOrDie(211,6503
 
-loctree.c,168
-u32 lpack(8,280
-void lunpack(26,638
-u32 lpackNormal(32,811
-void lunpackNormal(50,1188
-void initOctree(58,1431
-void growOctree(69,1777
-u32 calculateNode(126,3338
+loctree.c,281
+u32 lpackColor(8,280
+void lunpack(26,643
+u32 lpackNormal(32,816
+void lunpackNormal(50,1193
+u32 lpackFloat(58,1436
+float lunpackFloat(78,1729
+u32 lpackRadius(94,2072
+float lunpackRadius(97,2126
+void initOctree(101,2196
+void growOctree(121,2779
+u32 calculateNode(178,4354
 
-lshapes.c,18
+lshapes.c,41
 int sphere(7,262
+int mandelbrot(23,578
 
-main.c,840
+main.c,904
 #define COMPUTE_GROUP_SIZE 10,320
 #define GBUFFER_WIDTH 12,353
 #define GBUFFER_HEIGHT 13,394
 #define GBUFFER_SIZE 14,436
 #define OCTREE_SIZE 16,493
 #define OCTREE_INITIAL_SIZE 17,522
-#define OCTREE_INCREMENTAL_SIZE 18,557
-#define WIREFRAME_SIZE 19,596
-#define FOV_MINIMUM 21,626
-#define FOV_MAXIMUM 22,660
-GLuint buildWireframe(26,768
-int movingWindow 28,810
-int movingFov 29,832
-float fov 30,851
-int wireframe 32,874
-int fullscreen 33,893
-int dwidth,34,913
-int dwidth, dheight;34,913
-int pixelSize 35,934
-int grow 36,953
-float sfps 39,987
-float rotx 40,1006
-int rel 41,1054
-int blowup 42,1067
-float scale 43,1083
-lvec trns 44,1100
-u64 disableMouseTime 45,1126
-void quit(47,1153
-void keys(50,1198
-void touches(110,3191
-void wms(204,6629
-void mice(211,6825
-int main(272,8490
-GLuint buildWireframe(500,15306
+#define OCTREE_INCREMENTAL_SIZE 18,555
+#define WIREFRAME_SIZE 19,591
+#define FOV_MINIMUM 21,621
+#define FOV_MAXIMUM 22,655
+u32 buildWireframe(24,690
+int movingWindow 26,747
+int movingFov 27,769
+float fov 28,788
+int wireframe 30,811
+int fullscreen 31,830
+int dwidth,32,850
+int dwidth, dheight;32,850
+int pixelSize 33,871
+int grow 34,890
+float sfps 37,924
+float rotx 38,943
+int rel 39,991
+int blowup 40,1004
+float scale 41,1020
+lvec trns 42,1037
+u64 disableMouseTime 43,1063
+GLuint buffers[buffers46,1132
+GLuint buffers[ 3 ], texs[texs46,1132
+void quit(49,1167
+void keys(62,1493
+void touches(125,3528
+void wms(219,6966
+void mice(226,7162
+int main(287,8827
+u32 buildWireframe(527,15949
 
 os.c,150
 #define WIN32_LEAN_AND_MEAN6,284

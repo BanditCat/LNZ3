@@ -21,7 +21,7 @@ int sphere( lvec pos, const void* params ){
     return 0;
 }
 int mandelbrot( lvec pos, const void* params ){
-  const mandlebrotParams* p = params;
+  const mandelbrotParams* p = params;
   lvec t;
   lvcopy( t, p->center );
   lvscale( t, -1.0 );

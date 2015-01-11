@@ -56,14 +56,40 @@ void lunpackNormal( u32 ans, lvec v ){
 }
 
 u32 lpackFloat( float v ){
-  v = v * 0.5 + 0.5;
-  v *= 4294967296;
-  return v;
+  if( v == 0.0 )
+    return 0;
+  u32 sgn = 0;
+  if( v < 0.0 ){
+    v = -v;
+    sgn = ( 1 << 31 );
+  }
+  
+  int e;
+  float f = frexpf( v, &e );
+  e += 126;
+  u32 ans = f * (float)( 1 << 24 );
+
+  ans = ans - (1<<23);
+  ans += ( (u32)e << 23 );
+  return sgn + ans;
 }
+
+
 float lunpackFloat( u32 u ){
-  float v = (float)u / 4294967296.0;
-  v = v * 2.0 - 1.0;
-  return v;
+  if( u == 0 )
+    return 0.0;
+  float sign = 1.0;
+  if( u >= (u32)( 1 << 31 ) ){
+    sign = -1.0;
+    u -= ( 1 << 31 );
+  }
+  u32 nfn = u & ( ( 1 << 23 ) - 1 );
+  nfn += ( 1 << 23 );
+  int ne = u >> 23;
+  ne -= 126;
+  float nnf = nfn / (float)( 1 << 24 );
+  float nr = pow( 2.0, ne ) * nnf;
+  return sign * nr;
 }
 u32 lpackRadius( float v ){
   return 0 - log2( v );

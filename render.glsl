@@ -182,11 +182,19 @@ vec3 unpack( uint ans ){
 }
 
 float unpackFloat( uint u ){
-  float v = float( u ) / 4294967296.0;
-  v = v * 2.0 - 1.0;
-  return v;
+  float sign = 1.0;
+  if( u >= uint( uint(1) << 31 ) ){
+    sign = -1.0;
+    u -= ( uint(1) << 31 );
+  }
+  uint nfn = u & ( ( uint(1) << 23 ) - 1 );
+  nfn += ( 1 << 23 );
+  int ne = int( u >> 23 );
+  ne -= 126;
+  float nnf = nfn / float( uint(1) << 24 );
+  float nr = exp2( ne ) * nnf;
+  return sign * nr;
 }
-
 
 
 

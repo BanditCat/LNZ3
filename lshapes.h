@@ -18,7 +18,7 @@ typedef struct{
   lvec center;
   float scale;
   u32 iterations;
-} mandlebrotParams;
+} mandelbrotParams;
 int mandelbrot( lvec pos, const void* params );
 
 #endif // LSHAOES_H
