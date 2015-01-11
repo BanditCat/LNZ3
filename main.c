@@ -358,7 +358,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 3.0, 16 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 3.0, 16 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -553,7 +553,7 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   float* cubeRadii = lmalloc( WIREFRAME_SIZE * sizeof( float ) );
   nodes[ 0 ] = 0;
   cubeCenters[ 0 ][ 0 ] = cubeCenters[ 0 ][ 1 ] = cubeCenters[ 0 ][ 2 ] = 0.0;
-  cubeRadii[ 0 ] = 20.0;
+  cubeRadii[ 0 ] = 1.0;
     
   for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
     if( octree[ 2 + i ] <= VALID_CHILD ){

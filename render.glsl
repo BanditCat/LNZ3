@@ -56,7 +56,7 @@ void main( void ){
     vec3 ray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
   
     vec3 cubeCenter = { 0.0, 0.0, 0.0 };
-    float cubeRadius = 20.0;
+    float cubeRadius = 1A.0;
 
     origin = ( vec4( origin, 1.0 ) * rmv ).xyz;
     ray = normalize( ( vec4( ray, 1.0 ) * rmv ).xyz - origin );
