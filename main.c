@@ -61,8 +61,8 @@ void quit( void ){
   if( len == 0 )
     LNZModalMessage( "Failed to write!" );
   
-  SDL_Log( "Compressed %u to %u bytes, %u out of %u octree nodes used.",
-	   sz, len, octree[ 0 ], OCTREE_SIZE );
+  SDL_Log( "%u out of %u octree nodes used.",
+	   octree[ 0 ], OCTREE_SIZE );
   if( out != NULL )
     gzclose( out );
   

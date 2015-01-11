@@ -29,7 +29,7 @@ float unpackFloat( uint v );
 float unpackRadius( uint v );
 
 const uint octreeNodeSize = 16;
-const uint maxCount = 32;
+const uint maxCount = 2048;
 const uint unexplored = 4294967295u;
 const uint valid = 4294967292u;
 const vec3 cubeVecs[ 8 ] = 
@@ -84,7 +84,7 @@ float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   float tOut = min( min( t.x, t.y ), t.z );
   t = ( axisIn - origin ) / ray;
   float tIn = max( max( t.x, t.y ), t.z );
-  
+
   if( tIn <= tOut )
     if( tIn > 0.0 )
       return tIn;
@@ -99,8 +99,9 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   float tval;
   uint node = 0;
   uint sel = 0;
+  float newRadius = cubeRadius;
 
-  for( uint i = 0; i < 800; ++i ){
+  for( uint i = 0; i < maxCount; ++i ){
 
     uint asel = 0;
     if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
@@ -121,6 +122,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
       cubeCenter.x = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 10)).x);
       cubeCenter.y = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 11)).x);
       cubeCenter.z = unpackFloat( imageLoad( octree, int( node * octreeNodeSize + 12)).x);
+      newRadius = unpackRadius( imageLoad( octree, int( node * octreeNodeSize + 14)).x);
       asel = 0;
       if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
 	asel = asel + 1;
@@ -150,6 +152,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	if( t > 0.0 ){
 	  node = addr;
 	  cubeCenter = cc;
+	  newRadius = r * cubeRadius;
 	  tval = t;
 	  sel = 0;
 	  continue;
