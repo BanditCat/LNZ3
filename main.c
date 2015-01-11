@@ -47,16 +47,24 @@ GLuint buffers[ 3 ], texs[ 3 ];
  
 
 void quit( void ){
-  {
-    char msg[ 65536 ];
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
-    u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+  glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
+  u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+  
+  u32 sz = octree[ 0 ] * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
     
-    
-     sprintf( msg, "Octree byte size: %u", octree[ 0 ] );
-    glUnmapBuffer( GL_ARRAY_BUFFER );
-    LNZModalMessage( msg );
-  }
+  gzFile out = gzopen( "octree", "w" );
+  int len = 1;
+  if( out == NULL )
+    LNZModalMessage( "Failed to open file to save!" );
+  else
+    len = gzwrite( out, octree, sz );
+  if( len == 0 )
+    LNZModalMessage( "Failed to write!" );
+  if( out != NULL )
+    gzclose( out );
+  
+  glUnmapBuffer( GL_ARRAY_BUFFER );
+
   exit( EXIT_SUCCESS );
 }
 void keys( const SDL_Event* ev ){ 
@@ -286,15 +294,6 @@ void mice( const SDL_Event* ev ){
 
 int main( int argc, char* argv[] ){
   (void)(argc);(void)(argv);
-  {
-    for( u32 i = 0; i < 10; ++i ){
-      float r = 0.0;//(float)rand() / (float)RAND_MAX * 50.0 - 25.0;
-     
-      
-      if( r != lunpackFloat( lpackFloat( r ) ) )
-	LNZModalMessage( "foof" );
-    }
-  }
 
   srand( SDL_GetPerformanceCounter() );
 
@@ -332,6 +331,7 @@ int main( int argc, char* argv[] ){
 
 
 
+
   GLuint screenQuadBuffer;
   GLfloat screenQuad[ 8 ] = { -1, -1, 1, -1, 1, 1, -1, 1 };
   glGenBuffers( 1, &screenQuadBuffer );
@@ -351,19 +351,30 @@ int main( int argc, char* argv[] ){
 		  NULL, GL_DYNAMIC_COPY );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
   }
- 
+
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 0.8, 256 };
+  static const mandelbrotParams mndlb = { { 0.0001, 0.0001, -0.0001 }, 3.0, 256 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_DYNAMIC_DRAW );
     u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-
-    initOctree( sphere, octree, &mndlb );
-    growOctree( sphere, octree, &mndlb, OCTREE_INITIAL_SIZE );
+    octree[ 0 ] = 0;
+    gzFile in = gzopen( "octree", "r" );
+    int len = 0;
+    if( in != NULL ){
+      do{
+	len = gzread( in, (u8*)( octree ) + len, 1024 * 1024 );
+      } while( len );
+    }
+    gzclose( in );
+    
+    if( octree[ 0 ] == 0 ){
+      initOctree( mandelbrot, octree, &mndlb );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
+    }
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -439,7 +450,7 @@ int main( int argc, char* argv[] ){
     if( grow ){
       glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ARRAY_BUFFER );
       glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }

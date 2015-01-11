@@ -13,7 +13,7 @@ CC=gcc
 CCFLAGS=-std=c11 -Wall -fno-exceptions -pedantic -Wextra -Werror -c 
 CCINCFLAG=-I/include/SDL2 -Iglew
 LD=gcc
-LDFLAGS=-Lglew -lglew32 -lSDL2_test -lmingw32 -lSDL2main -lSDL2 -lopengl32 -mwindows -L/lib -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--no-undefined -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc
+LDFLAGS=-Lglew -lz -lglew32 -lSDL2_test -lmingw32 -lSDL2main -lSDL2 -lopengl32 -mwindows -L/lib -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--no-undefined -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc 
 
 
 TARGET=lnz.exe

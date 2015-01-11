@@ -21,7 +21,7 @@ lmat.o: lmat.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h
 lnz.o: lnz.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_main.h c:/root/include/SDL2/SDL_stdinc.h \
  c:/root/include/SDL2/SDL_config.h c:/root/include/SDL2/SDL_platform.h \
@@ -45,7 +45,7 @@ lnz.o: lnz.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h
 loctree.o: loctree.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_main.h c:/root/include/SDL2/SDL_stdinc.h \
  c:/root/include/SDL2/SDL_config.h c:/root/include/SDL2/SDL_platform.h \
@@ -69,7 +69,7 @@ loctree.o: loctree.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h
 lshapes.o: lshapes.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_main.h c:/root/include/SDL2/SDL_stdinc.h \
  c:/root/include/SDL2/SDL_config.h c:/root/include/SDL2/SDL_platform.h \
@@ -93,7 +93,7 @@ lshapes.o: lshapes.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h
 main.o: main.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_main.h c:/root/include/SDL2/SDL_stdinc.h \
  c:/root/include/SDL2/SDL_config.h c:/root/include/SDL2/SDL_platform.h \
@@ -117,7 +117,7 @@ main.o: main.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h
 os.o: os.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_main.h c:/root/include/SDL2/SDL_stdinc.h \
  c:/root/include/SDL2/SDL_config.h c:/root/include/SDL2/SDL_platform.h \
@@ -141,4 +141,5 @@ os.o: os.c lnz.h c:/root/include/SDL2/SDL.h \
  c:/root/include/SDL2/SDL_messagebox.h c:/root/include/SDL2/SDL_power.h \
  c:/root/include/SDL2/SDL_render.h c:/root/include/SDL2/SDL_system.h \
  c:/root/include/SDL2/SDL_timer.h c:/root/include/SDL2/SDL_version.h \
- glew/glew.h lmat.h loctree.h lshapes.h c:/root/include/SDL2/SDL_syswm.h
+ glew/glew.h zlib.h zconf.h lmat.h loctree.h lshapes.h \
+ c:/root/include/SDL2/SDL_syswm.h

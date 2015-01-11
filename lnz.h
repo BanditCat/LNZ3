@@ -13,6 +13,7 @@
 #include "glew.h"
 #include <limits.h>
 #include <math.h>
+#include "zlib.h"
 
 // Types.
 typedef unsigned char u8;

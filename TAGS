@@ -23,35 +23,35 @@ void lvnormalize(29,903
 lnz.h,936
 #define LNZ_H8,279
 #define GLEW_STATIC12,312
-typedef unsigned char u8;18,399
-typedef unsigned short int u16;19,425
-typedef unsigned int u32;20,457
-typedef unsigned long long int u64;21,483
-typedef signed char s8;22,519
-typedef signed short int s16;23,543
-typedef signed int s32;24,573
-typedef signed long long int s64;25,597
-typedef float f32;26,631
-typedef double f64;27,650
-#define pi 58,1746
-SDL_DisplayMode fullscreenDM;61,1907
-SDL_Window* mainWindow;63,1957
-SDL_GLContext glContext;65,2004
-void* lmalloc(68,2052
-void LNZInit(70,2109
-void LNZReinit(73,2245
-void LNZOSReinit(76,2373
-void LNZQuit(78,2400
-void LNZLoop(81,2447
-void LNZSetKeyHandler(84,2539
-void LNZSetTouchHandler(85,2593
-void LNZSetMouseHandler(86,2649
-void LNZSetWindowHandler(87,2705
-u8* LNZLoadResource(92,2983
-u8* LNZLoadResourceOrDie(93,3035
-void LNZModalMessage(95,3093
-GLuint LNZCompileOrDie(98,3182
-GLuint LNZLinkOrDie(100,3290
+typedef unsigned char u8;19,417
+typedef unsigned short int u16;20,443
+typedef unsigned int u32;21,475
+typedef unsigned long long int u64;22,501
+typedef signed char s8;23,537
+typedef signed short int s16;24,561
+typedef signed int s32;25,591
+typedef signed long long int s64;26,615
+typedef float f32;27,649
+typedef double f64;28,668
+#define pi 59,1764
+SDL_DisplayMode fullscreenDM;62,1925
+SDL_Window* mainWindow;64,1975
+SDL_GLContext glContext;66,2022
+void* lmalloc(69,2070
+void LNZInit(71,2127
+void LNZReinit(74,2263
+void LNZOSReinit(77,2391
+void LNZQuit(79,2418
+void LNZLoop(82,2465
+void LNZSetKeyHandler(85,2557
+void LNZSetTouchHandler(86,2611
+void LNZSetMouseHandler(87,2667
+void LNZSetWindowHandler(88,2723
+u8* LNZLoadResource(93,3001
+u8* LNZLoadResourceOrDie(94,3053
+void LNZModalMessage(96,3111
+GLuint LNZCompileOrDie(99,3200
+GLuint LNZLinkOrDie(101,3308
 
 loctree.h,617
 #define LOCTREE_H8,295
@@ -88,6 +88,396 @@ int sphere(15,447
   u32 iterations;20,538
 } mandelbrotParams;21,556
 int mandelbrot(22,576
+
+zconf.h,6209
+#define ZCONF_H9,217
+#  define Z_PREFIX_SET18,599
+#  define _dist_code 21,648
+#  define _length_code 22,693
+#  define _tr_align 23,740
+#  define _tr_flush_bits 24,784
+#  define _tr_flush_block 25,833
+#  define _tr_init 26,883
+#  define _tr_stored_block 27,926
+#  define _tr_tally 28,977
+#  define adler32 29,1021
+#  define adler32_combine 30,1063
+#  define adler32_combine64 31,1113
+#    define compress 33,1182
+#    define compress2 34,1227
+#    define compressBound 35,1273
+#  define crc32 37,1332
+#  define crc32_combine 38,1372
+#  define crc32_combine64 39,1420
+#  define deflate 40,1470
+#  define deflateBound 41,1512
+#  define deflateCopy 42,1559
+#  define deflateEnd 43,1605
+#  define deflateInit2_ 44,1650
+#  define deflateInit_ 45,1698
+#  define deflateParams 46,1745
+#  define deflatePending 47,1793
+#  define deflatePrime 48,1842
+#  define deflateReset 49,1889
+#  define deflateResetKeep 50,1936
+#  define deflateSetDictionary 51,1987
+#  define deflateSetHeader 52,2042
+#  define deflateTune 53,2093
+#  define deflate_copyright 54,2139
+#  define get_crc_table 55,2191
+#    define gz_error 57,2256
+#    define gz_intmax 58,2301
+#    define gz_strwinerror 59,2347
+#    define gzbuffer 60,2398
+#    define gzclearerr 61,2443
+#    define gzclose 62,2490
+#    define gzclose_r 63,2534
+#    define gzclose_w 64,2580
+#    define gzdirect 65,2626
+#    define gzdopen 66,2671
+#    define gzeof 67,2715
+#    define gzerror 68,2757
+#    define gzflush 69,2801
+#    define gzgetc 70,2845
+#    define gzgetc_ 71,2888
+#    define gzgets 72,2932
+#    define gzoffset 73,2975
+#    define gzoffset64 74,3020
+#    define gzopen 75,3067
+#    define gzopen64 76,3110
+#      define gzopen_w 78,3173
+#    define gzprintf 80,3231
+#    define gzvprintf 81,3276
+#    define gzputc 82,3322
+#    define gzputs 83,3365
+#    define gzread 84,3408
+#    define gzrewind 85,3451
+#    define gzseek 86,3496
+#    define gzseek64 87,3539
+#    define gzsetparams 88,3584
+#    define gztell 89,3632
+#    define gztell64 90,3675
+#    define gzungetc 91,3720
+#    define gzwrite 92,3765
+#  define inflate 94,3818
+#  define inflateBack 95,3860
+#  define inflateBackEnd 96,3906
+#  define inflateBackInit_ 97,3955
+#  define inflateCopy 98,4006
+#  define inflateEnd 99,4052
+#  define inflateGetHeader 100,4097
+#  define inflateInit2_ 101,4148
+#  define inflateInit_ 102,4196
+#  define inflateMark 103,4243
+#  define inflatePrime 104,4289
+#  define inflateReset 105,4336
+#  define inflateReset2 106,4383
+#  define inflateSetDictionary 107,4431
+#  define inflateGetDictionary 108,4486
+#  define inflateSync 109,4541
+#  define inflateSyncPoint 110,4587
+#  define inflateUndermine 111,4638
+#  define inflateResetKeep 112,4689
+#  define inflate_copyright 113,4740
+#  define inflate_fast 114,4792
+#  define inflate_table 115,4839
+#    define uncompress 117,4904
+#  define zError 119,4960
+#    define zcalloc 121,5018
+#    define zcfree 122,5062
+#  define zlibCompileFlags 124,5114
+#  define zlibVersion 125,5165
+#  define Byte 128,5258
+#  define Bytef 129,5297
+#  define alloc_func 130,5337
+#  define charf 131,5382
+#  define free_func 132,5422
+#    define gzFile 134,5483
+#  define gz_header 136,5535
+#  define gz_headerp 137,5579
+#  define in_func 138,5624
+#  define intf 139,5666
+#  define out_func 140,5705
+#  define uInt 141,5748
+#  define uIntf 142,5787
+#  define uLong 143,5827
+#  define uLongf 144,5867
+#  define voidp 145,5908
+#  define voidpc 146,5948
+#  define voidpf 147,5989
+#  define gz_header_s 150,6076
+#  define internal_state 151,6122
+#  define MSDOS156,6222
+#  define OS2159,6302
+#  define WINDOWS162,6366
+#    define WIN32166,6472
+#      define SYS16BIT172,6671
+#  define MAXSEG_64K182,6882
+#  define UNALIGNED_OK185,6923
+#    define STDC190,6993
+#      define STDC99194,7072
+#  define STDC199,7186
+#  define STDC202,7275
+#  define STDC205,7374
+#  define STDC208,7457
+#  define STDC212,7557
+#    define const 217,7667
+#  define z_const 222,7798
+#  define z_const224,7828
+#  define NO_DUMMY_DECL229,7987
+#    define MAX_MEM_LEVEL 235,8110
+#    define MAX_MEM_LEVEL 237,8146
+#  define MAX_WBITS 247,8436
+#    define OF(267,9216
+#    define OF(269,9251
+#    define Z_ARG(275,9392
+#    define Z_ARG(277,9430
+#    define SMALL_MEDIUM290,9892
+#      define FAR 292,9937
+#      define FAR 294,9970
+#    define SMALL_MEDIUM299,10103
+#      define FAR 301,10152
+#      define FAR 303,10185
+#        define ZEXTERN 315,10537
+#        define ZEXTERN 317,10602
+#      undef FAR327,10922
+#    define ZEXPORT 332,11103
+#      define ZEXPORTVA 334,11147
+#      define ZEXPORTVA 336,11189
+#      define ZEXPORT 344,11317
+#      define ZEXPORTVA 345,11363
+#      define ZEXPORT 347,11419
+#      define ZEXPORTVA 348,11465
+#  define ZEXTERN 354,11555
+#  define ZEXPORT357,11603
+#  define ZEXPORTVA360,11646
+#  define FAR364,11686
+typedef unsigned char  Byte;368,11735
+typedef unsigned int   uInt;370,11785
+typedef unsigned long  uLong;371,11837
+#  define Bytef 375,11985
+   typedef Byte  FAR Bytef;377,12016
+typedef char  FAR charf;379,12051
+typedef int   FAR intf;380,12076
+typedef uInt  FAR uIntf;381,12100
+typedef uLong FAR uLongf;382,12125
+   typedef void const *voidpc;voidpc385,12164
+   typedef void FAR   *voidpf;voidpf386,12195
+   typedef void       *voidp;voidp387,12226
+   typedef Byte const *voidpc;voidpc389,12262
+   typedef Byte FAR   *voidpf;voidpf390,12293
+   typedef Byte       *voidp;voidp391,12324
+#    define Z_U4 397,12473
+#    define Z_U4 399,12535
+#    define Z_U4 401,12602
+   typedef Z_U4 z_crc_t;406,12663
+   typedef unsigned long z_crc_t;408,12694
+#  define Z_HAVE_UNISTD_H412,12801
+#  define Z_HAVE_STDARG_H416,12900
+#  undef _LARGEFILE64_SOURCE444,13673
+#  define Z_HAVE_UNISTD_H448,13764
+#      define z_off_t 457,14047
+#  define Z_LFS64463,14155
+#  define Z_LARGE64467,14234
+#  define Z_WANT64471,14342
+#  define SEEK_SET 475,14412
+#  define SEEK_CUR 476,14482
+#  define SEEK_END 477,14551
+#  define z_off_t 481,14653
+#  define z_off64_t 485,14727
+#    define z_off64_t 488,14825
+#    define z_off64_t 490,14863
+
+zlib.h,7691
+#define ZLIB_H32,1342
+#define ZLIB_VERSION 40,1418
+#define ZLIB_VERNUM 41,1447
+#define ZLIB_VER_MAJOR 42,1474
+#define ZLIB_VER_MINOR 43,1499
+#define ZLIB_VER_REVISION 44,1524
+#define ZLIB_VER_SUBREVISION 45,1552
+typedef voidpf (*alloc_func)alloc_func80,3283
+typedef void   (*free_func)free_func81,3356
+typedef struct z_stream_s 85,3447
+    z_const Bytef *next_in;next_in86,3475
+    uInt     avail_in;87,3529
+    uLong    total_in;88,3596
+    Bytef    *next_out;next_out90,3667
+    uInt     avail_out;91,3734
+    uLong    total_out;92,3797
+    z_const char *msg;msg94,3864
+    struct internal_state FAR *state;state95,3931
+    alloc_func zalloc;97,4004
+    free_func  zfree;98,4070
+    voidpf     opaque;99,4132
+    int     data_type;101,4210
+    uLong   adler;102,4287
+    uLong   reserved;103,4356
+} z_stream;104,4410
+typedef z_stream FAR *z_streamp;z_streamp106,4423
+typedef struct gz_header_s 112,4592
+    int     text;113,4621
+    uLong   time;114,4695
+    int     xflags;115,4743
+    int     os;116,4821
+    Bytef   *extra;extra117,4868
+    uInt    extra_len;118,4939
+    uInt    extra_max;119,5015
+    Bytef   *name;name120,5087
+    uInt    name_max;121,5164
+    Bytef   *comment;comment122,5235
+    uInt    comm_max;123,5310
+    int     hcrc;124,5384
+    int     done;125,5456
+} gz_header;127,5584
+typedef gz_header FAR *gz_headerp;gz_headerp129,5598
+#define Z_NO_FLUSH 164,7368
+#define Z_PARTIAL_FLUSH 165,7394
+#define Z_SYNC_FLUSH 166,7420
+#define Z_FULL_FLUSH 167,7446
+#define Z_FINISH 168,7472
+#define Z_BLOCK 169,7498
+#define Z_TREES 170,7524
+#define Z_OK 173,7625
+#define Z_STREAM_END 174,7651
+#define Z_NEED_DICT 175,7677
+#define Z_ERRNO 176,7703
+#define Z_STREAM_ERROR 177,7731
+#define Z_DATA_ERROR 178,7759
+#define Z_MEM_ERROR 179,7787
+#define Z_BUF_ERROR 180,7815
+#define Z_VERSION_ERROR 181,7843
+#define Z_NO_COMPRESSION 186,8025
+#define Z_BEST_SPEED 187,8060
+#define Z_BEST_COMPRESSION 188,8095
+#define Z_DEFAULT_COMPRESSION 189,8130
+#define Z_FILTERED 192,8192
+#define Z_HUFFMAN_ONLY 193,8224
+#define Z_RLE 194,8256
+#define Z_FIXED 195,8288
+#define Z_DEFAULT_STRATEGY 196,8320
+#define Z_BINARY 199,8418
+#define Z_TEXT 200,8439
+#define Z_ASCII 201,8460
+#define Z_UNKNOWN 202,8535
+#define Z_DEFLATED 205,8625
+#define Z_NULL 208,8727
+#define zlib_version 210,8792
+ZEXTERN const char * ZEXPORT zlibVersion OF(216,8922
+ZEXTERN int ZEXPORT deflate OF(246,10350
+ZEXTERN int ZEXPORT deflateEnd OF(353,16442
+ZEXTERN int ZEXPORT inflate OF(392,18338
+ZEXTERN int ZEXPORT inflateEnd OF(508,25553
+ZEXTERN int ZEXPORT deflateSetDictionary OF(587,29569
+ZEXTERN int ZEXPORT deflateCopy OF(631,32233
+ZEXTERN int ZEXPORT deflateReset OF(649,33079
+ZEXTERN int ZEXPORT deflateParams OF(660,33554
+ZEXTERN int ZEXPORT deflateTune OF(681,34633
+ZEXTERN uLong ZEXPORT deflateBound OF(698,35506
+ZEXTERN int ZEXPORT deflatePending OF(713,36359
+ZEXTERN int ZEXPORT deflatePrime OF(728,37090
+ZEXTERN int ZEXPORT deflateSetHeader OF(745,37949
+ZEXTERN int ZEXPORT inflateSetDictionary OF(819,42262
+ZEXTERN int ZEXPORT inflateGetDictionary OF(842,43601
+ZEXTERN int ZEXPORT inflateSync OF(857,44361
+ZEXTERN int ZEXPORT inflateCopy OF(876,45350
+ZEXTERN int ZEXPORT inflateReset OF(892,46021
+ZEXTERN int ZEXPORT inflateReset2 OF(902,46454
+ZEXTERN int ZEXPORT inflatePrime OF(914,46962
+ZEXTERN long ZEXPORT inflateMark OF(935,48016
+ZEXTERN int ZEXPORT inflateGetHeader OF(963,49583
+typedef unsigned (*in_func)in_func1025,53165
+typedef int (*out_func)out_func1027,53278
+ZEXTERN int ZEXPORT inflateBack OF(1029,53352
+ZEXTERN int ZEXPORT inflateBackEnd OF(1099,57807
+ZEXTERN uLong ZEXPORT zlibCompileFlags OF(1107,58035
+ZEXTERN int ZEXPORT compress OF(1160,60089
+ZEXTERN int ZEXPORT compress2 OF(1174,60716
+ZEXTERN uLong ZEXPORT compressBound OF(1190,61505
+ZEXTERN int ZEXPORT uncompress OF(1197,61790
+typedef struct gzFile_s *gzFile;gzFile1224,63182
+ZEXTERN gzFile ZEXPORT gzdopen OF(1264,65386
+ZEXTERN int ZEXPORT gzbuffer OF(1287,66697
+ZEXTERN int ZEXPORT gzsetparams OF(1304,67522
+ZEXTERN int ZEXPORT gzread OF(1313,67845
+ZEXTERN int ZEXPORT gzwrite OF(1341,69428
+ZEXTERN int ZEXPORTVA gzprintf Z_ARG(1349,69703
+ZEXTERN int ZEXPORT gzputs OF(1364,70596
+ZEXTERN char * ZEXPORT gzgets OF(1372,70857
+ZEXTERN int ZEXPORT gzputc OF(1385,71492
+ZEXTERN int ZEXPORT gzgetc OF(1391,71695
+ZEXTERN int ZEXPORT gzungetc OF(1400,72098
+ZEXTERN int ZEXPORT gzflush OF(1412,72726
+ZEXTERN int ZEXPORT    gzrewind OF(1447,74310
+ZEXTERN int ZEXPORT gzeof OF(1475,75368
+ZEXTERN int ZEXPORT gzdirect OF(1490,76155
+ZEXTERN int ZEXPORT    gzclose OF(1511,77146
+ZEXTERN int ZEXPORT gzclose_r OF(1524,77794
+ZEXTERN int ZEXPORT gzclose_w OF(1525,77843
+ZEXTERN const char * ZEXPORT gzerror OF(1536,78371
+ZEXTERN void ZEXPORT gzclearerr OF(1552,79158
+ZEXTERN uLong ZEXPORT adler32 OF(1569,79656
+ZEXTERN uLong ZEXPORT crc32   OF(1600,80816
+ZEXTERN int ZEXPORT deflateInit_ OF(1633,81976
+ZEXTERN int ZEXPORT inflateInit_ OF(1635,82117
+ZEXTERN int ZEXPORT deflateInit2_ OF(1637,82247
+ZEXTERN int ZEXPORT inflateInit2_ OF(1641,82524
+ZEXTERN int ZEXPORT inflateBackInit_ OF(1643,82673
+#define deflateInit(1647,82936
+#define inflateInit(1649,83046
+#define deflateInit2(1651,83140
+#define inflateInit2(1654,83359
+#define inflateBackInit(1657,83505
+struct gzFile_s 1670,84143
+    unsigned have;1671,84161
+    unsigned char *next;next1672,84180
+    z_off64_t pos;1673,84205
+ZEXTERN int ZEXPORT gzgetc_ OF(1675,84227
+#  undef z_gzgetc1677,84324
+#  define z_gzgetc(1678,84342
+#  define gzgetc(1681,84450
+   ZEXTERN gzFile ZEXPORT gzopen64 OF(1692,84940
+   ZEXTERN z_off64_t ZEXPORT gzseek64 OF(1693,85009
+   ZEXTERN z_off64_t ZEXPORT gztell64 OF(1694,85077
+   ZEXTERN z_off64_t ZEXPORT gzoffset64 OF(1695,85129
+   ZEXTERN uLong ZEXPORT adler32_combine64 OF(1696,85183
+   ZEXTERN uLong ZEXPORT crc32_combine64 OF(1697,85257
+#    define z_gzopen 1702,85408
+#    define z_gzseek 1703,85440
+#    define z_gztell 1704,85472
+#    define z_gzoffset 1705,85504
+#    define z_adler32_combine 1706,85540
+#    define z_crc32_combine 1707,85590
+#    define gzopen 1709,85644
+#    define gzseek 1710,85672
+#    define gztell 1711,85700
+#    define gzoffset 1712,85728
+#    define adler32_combine 1713,85760
+#    define crc32_combine 1714,85806
+     ZEXTERN gzFile ZEXPORT gzopen64 OF(1717,85877
+     ZEXTERN z_off_t ZEXPORT gzseek64 OF(1718,85948
+     ZEXTERN z_off_t ZEXPORT gztell64 OF(1719,86014
+     ZEXTERN z_off_t ZEXPORT gzoffset64 OF(1720,86066
+     ZEXTERN uLong ZEXPORT adler32_combine64 OF(1721,86120
+     ZEXTERN uLong ZEXPORT crc32_combine64 OF(1722,86194
+   ZEXTERN gzFile ZEXPORT gzopen OF(1725,86281
+   ZEXTERN z_off_t ZEXPORT gzseek OF(1726,86348
+   ZEXTERN z_off_t ZEXPORT gztell OF(1727,86410
+   ZEXTERN z_off_t ZEXPORT gzoffset OF(1728,86458
+   ZEXTERN uLong ZEXPORT adler32_combine OF(1729,86508
+   ZEXTERN uLong ZEXPORT crc32_combine OF(1730,86578
+   ZEXTERN uLong ZEXPORT adler32_combine OF(1735,86674
+   ZEXTERN uLong ZEXPORT crc32_combine OF(1736,86744
+    struct internal_state 1742,86915
+    struct internal_state {int dummy;1742,86915
+ZEXTERN const char   * ZEXPORT zError           OF(1746,86992
+ZEXTERN int            ZEXPORT inflateSyncPoint OF(1747,87051
+ZEXTERN const z_crc_t FAR * ZEXPORT get_crc_table    OF(1748,87116
+ZEXTERN int            ZEXPORT inflateUndermine OF(1749,87181
+ZEXTERN int            ZEXPORT inflateResetKeep OF(1750,87251
+ZEXTERN int            ZEXPORT deflateResetKeep OF(1751,87316
+ZEXTERN gzFile         ZEXPORT gzopen_w OF(1753,87421
+ZEXTERN int            ZEXPORTVA gzvprintf Z_ARG(1758,87620
 
 lmat.c,425
 void lmidentity(7,262
@@ -173,12 +563,12 @@ u64 disableMouseTime 43,1063
 GLuint buffers[buffers46,1132
 GLuint buffers[ 3 ], texs[texs46,1132
 void quit(49,1167
-void keys(62,1493
-void touches(125,3528
-void wms(219,6966
-void mice(226,7162
-int main(287,8827
-u32 buildWireframe(527,15949
+void keys(66,1684
+void touches(129,3719
+void wms(223,7157
+void mice(230,7353
+int main(291,9018
+u32 buildWireframe(523,15932
 
 os.c,150
 #define WIN32_LEAN_AND_MEAN6,284
