@@ -364,9 +364,11 @@ int main( int argc, char* argv[] ){
     octree[ 0 ] = 0;
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
+    u8* dst = (u8*)octree;
     if( in != NULL ){
       do{
-	len = gzread( in, (u8*)( octree ) + len, 1024 * 1024 );
+	len = gzread( in, dst, 1024 * 1024 );
+	dst += len;
       } while( len );
     }
     gzclose( in );
