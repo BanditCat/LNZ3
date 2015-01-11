@@ -430,7 +430,9 @@ int main( int argc, char* argv[] ){
 
   while( 1 ){
  
-    LNZLoop();
+    //Handle 32 events.
+    for( u32 i = 0; i < 32; ++i )
+      LNZLoop();
     {
       GLuint er = glGetError();
       if( er != GL_NO_ERROR ){

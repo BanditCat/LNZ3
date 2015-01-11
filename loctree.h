@@ -12,7 +12,7 @@
 
 #define OCTREE_NODE_SIZE 16
 // Maximum depth of an octree;
-#define MAX_OCTREE_DEPTH 64
+#define MAX_OCTREE_DEPTH 256
 
 #define INVALID ( 4294967295 )
 #define UNEXPLORED_CHILD ( 4294967295 )
