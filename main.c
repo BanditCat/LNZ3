@@ -497,7 +497,8 @@ int main( int argc, char* argv[] ){
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
 
     {
-      lvec lght = { 20.0, sinf( time * 400.0 ) * 120.0, cosf( time * 400.0 ) * 120.0 };
+      lvec lght = { 0.0, sinf( time * 400.0 ) * 0.0, cosf( time * 400.0 ) * 0.0 };
+      lvmult( lght, rmv );
       glUniform3f( lightloc, lght[ 0 ], lght[ 1 ], lght[ 2 ] );
     }
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 

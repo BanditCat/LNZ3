@@ -73,7 +73,17 @@ void lmtranslate( lmat mat, lvec v ){
 	m[ i * 4 + j ] = 0;
   lmmult( mat, m );
 }
-
+void lvmult( lvec va, const lmat m ){
+  for( u32 i = 0; i < 4; ++i ){
+    lvec v;
+    lvcopy( v, va );
+    float a = 0.0;
+    for( u32 j = 0; j < 3; ++j )
+      a += v[ j ] * m[ 4 * i + j ];
+    a += 1.0 * m[ 4 * i + 3 ];
+    va[ i ] = a;     
+  }
+}
 void lmmult( lmat m, const lmat n ){
   lmat tm;
   for( u32 i = 0; i < 16; ++i )
