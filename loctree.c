@@ -139,10 +139,11 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 	lvcopy( cc, cubeVecs[ i ] );
 	lvscale( cc, cubeRadii[ level ] * 0.5 );
 	lvadd( cc, cubeCenters[ level ] );
-	octree[ nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ] = 
+	u32 nn = octree[ nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ] = 
 	  calculateNode( inside, cc, cubeRadii[ level ] * 0.5, octree, params,
 			 nodes[ level ], i );
-	++calced;
+	if( nn <= VALID_CHILD )
+	  ++calced;
       }
     }
     
@@ -169,8 +170,8 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 	  lvcopy( cubeCenters[ ulvl + 1 ], cc );
 	  cubeRadii[ ulvl + 1 ] = cubeRadii[ ulvl ] * 0.5;
 	  nodes[ ++ulvl ] = nn;
-	} //else
-	  // break;
+	} else
+	  break;
       }      
     } while( ulvl < (s32)level );
   }
@@ -221,6 +222,8 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 13 ] = lpackRadius( cubeRadius );
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 14 ] = parent;
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 15 ] = child;
-  
+
+  if( cubeRadius >= lunpackRadius( octree[ OCTREE_NODE_SIZE * parent + 13 ] ) )
+    LNZModalMessage( "vff" );
   return octree[ 0 ]++;
 }
