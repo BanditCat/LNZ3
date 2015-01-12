@@ -226,11 +226,11 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
       else if( addr <= valid ){
 	  
 	vec3 cc;
-	cc.x = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 10)).x);
-	cc.y = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 11)).x);
-	cc.z = unpackFloat( imageLoad( octree, int( addr * octreeNodeSize + 12)).x);
+	cc.x = unpackFloat( imageLoad( octree, addr * octreeNodeSize + 10 ).x);
+	cc.y = unpackFloat( imageLoad( octree, addr * octreeNodeSize + 11 ).x);
+	cc.z = unpackFloat( imageLoad( octree, addr * octreeNodeSize + 12 ).x);
 	float r = unpackRadius( imageLoad( octree, 
-					   int( addr * octreeNodeSize + 13 ) ).x );
+					   addr * octreeNodeSize + 13 ).x );
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
 	  node = addr;
