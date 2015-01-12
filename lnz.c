@@ -65,6 +65,10 @@ void LNZInit( int fullscreen, const char* windowTitle,
     GLint max;
     glGetIntegerv( GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &max );
     SDL_Log( "Initialized with GL_MAX_COMPUTE_SHARED_MEMORY_SIZE = %i", max );
+    glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &max );
+    SDL_Log( "Initialized with GL_MAX_TEXTURE_BUFFER_SIZE = %i", max );
+    glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max );
+    SDL_Log( "Initialized with GL_MAX_TEXTURE_SIZE = %i", max );
   }
 }
 

@@ -30,7 +30,7 @@ vec3 unpackNormal( uint v );
 float unpackFloat( uint v );
 float unpackRadius( uint v );
 
-const int octreeNodeSize = 100;
+const int octreeNodeSize = 16;
 const uint maxCount = 2048;
 const uint unexplored = 4294967295u;
 const uint valid = 4294967292u;
