@@ -30,7 +30,7 @@ vec3 unpackNormal( uint v );
 float unpackFloat( uint v );
 float unpackRadius( uint v );
 
-const int octreeNodeSize = 16;
+const int octreeNodeSize = 100;
 const uint maxCount = 2048;
 const uint unexplored = 4294967295u;
 const uint valid = 4294967292u;
@@ -71,9 +71,9 @@ void main( void ){
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
       if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
-	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
+	ans = clamp( dot( -lray, norm ).xxx, 0.4, 1.0 ) * col;
       else
-	ans = 0.1 * col;
+	ans = 0.4 * col;
     }
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
@@ -166,8 +166,9 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	  sel = 0;
 	  if( newRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
 	    break;
-	  else
-	    continue;
+	  if( addr >= 262244 )
+	    break;
+	  continue;
 	}
       }
     }

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "math.h"
 
-#define COMPUTE_GROUP_SIZE 1024
+#define COMPUTE_GROUP_SIZE 256
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
@@ -16,7 +16,7 @@
 #define OCTREE_SIZE 10000000
 #define OCTREE_INITIAL_SIZE 100//( 262144 - 9 )
 #define OCTREE_INCREMENTAL_SIZE 500
-#define WIREFRAME_SIZE 65536
+#define WIREFRAME_SIZE 32768
 
 #define FOV_MINIMUM ( pi * 0.01 )
 #define FOV_MAXIMUM ( pi * 0.99 )
