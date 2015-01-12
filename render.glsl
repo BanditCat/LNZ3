@@ -72,9 +72,9 @@ void main( void ){
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, dm1, dm2 );
       vec3 lpos = lray * lval + light;
       if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
-	ans = clamp( dot( -lray, norm ).xxx, 0.3, 1.0 ) * col;
+	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
       else
-	ans = 0.3 * col;
+	ans = 0.1 * col;
     }
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
