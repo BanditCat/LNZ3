@@ -358,7 +358,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 1.0, 16 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 6.0, 16 };
   {
     glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -377,8 +377,8 @@ int main( int argc, char* argv[] ){
     gzclose( in );
     
     if( octree[ 0 ] == 0 ){
-      initOctree( sphere, octree, &mndlb );
-      growOctree( sphere, octree, &mndlb, OCTREE_INITIAL_SIZE );
+      initOctree( mandelbrot, octree, &mndlb );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
     }
 
     glUnmapBuffer( GL_ARRAY_BUFFER );
@@ -457,7 +457,7 @@ int main( int argc, char* argv[] ){
     if( grow ){
       glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ARRAY_BUFFER );
       glBindBuffer( GL_ARRAY_BUFFER, 0 );
     }
@@ -497,7 +497,7 @@ int main( int argc, char* argv[] ){
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
 
     {
-      lvec lght = { 20.0, 40.0, -10.0 };
+      lvec lght = { 20.0, 80.0, -290.0 };
       glUniform3f( lightloc, lght[ 0 ], lght[ 1 ], lght[ 2 ] );
     }
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
