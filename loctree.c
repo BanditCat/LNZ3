@@ -169,8 +169,8 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 	  lvcopy( cubeCenters[ ulvl + 1 ], cc );
 	  cubeRadii[ ulvl + 1 ] = cubeRadii[ ulvl ] * 0.5;
 	  nodes[ ++ulvl ] = nn;
-	} else
-	  break;
+	} //else
+	  // break;
       }      
     } while( ulvl < (s32)level );
   }
