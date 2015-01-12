@@ -10,15 +10,15 @@
 // 16 uints, normal, color, and 8 kids, a cube center and radius, the parent node, and a 0-8 child slector. The normal on node 0 is just the size. 
 
 
-#define OCTREE_NODE_SIZE ( 16 )
+#define OCTREE_NODE_SIZE ( 16u )
 // Maximum depth of an octree;
-#define MAX_OCTREE_DEPTH ( 256 )
+#define MAX_OCTREE_DEPTH ( 256u )
 
-#define INVALID ( 4294967295 )
-#define UNEXPLORED_CHILD ( 4294967295 )
-#define FULL_CHILD ( 4294967294 )
-#define EMPTY_CHILD ( 4294967293 )
-#define VALID_CHILD ( 4294967292 )
+#define INVALID ( 4294967295u )
+#define UNEXPLORED_CHILD ( 4294967295u )
+#define FULL_CHILD ( 4294967294u )
+#define EMPTY_CHILD ( 4294967293u )
+#define VALID_CHILD ( 4294967292u )
 
 // Should be 2^n + 1. 
 #define SUPERSAMPLE_DIM 3
