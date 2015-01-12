@@ -69,7 +69,7 @@ void main( void ){
       vec3 lray = normalize( rpos - light );
       float lval = raycastOctree( light, lray, cubeCenter, cubeRadius, dm1, dm2 );
       vec3 lpos = lray * lval + light;
-      if( distance( lpos, rpos ) < 20.0 )
+      if( distance( lpos, rpos ) > 20.0 )
 	ans = clamp( dot( lray, norm ), 0.1, 1.0 ) * col;
       else
 	ans = col * 0.1;
