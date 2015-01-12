@@ -22,7 +22,7 @@ float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
 		     in float cubeRadius, out vec3 color, out vec3 mormal );
 float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
-			   in float cubeRadius, out vec3 color, out vec3 mormal );
+			   in float cubeRadius, in vec3 rorigin );
 
 uint pack( in vec3 ans );
 vec3 unpack( in uint v );
@@ -64,12 +64,11 @@ void main( void ){
     vec3 ray = normalize( ( vec4( oray, 1.0 ) * rmv ).xyz - origin );
 
     {
-      vec3 dm1, dm2;
       vec3 col, norm;
       tval = raycastOctree( origin, ray, cubeCenter, cubeRadius, col, norm );
       vec3 rpos = ray * tval + origin;
       vec3 lray = normalize( rpos - light );
-      float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, dm1, dm2 );
+      float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
       if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
 	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
@@ -179,7 +178,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   return tval;
 }
 float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
-		     in float cubeRadius, out vec3 color, out vec3 normal ){
+		     in float cubeRadius, in vec3 rorigin ){
   float tval;
   uint node = 0;
   uint sel = 0;
@@ -239,14 +238,16 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	  newRadius = r * cubeRadius;
 	  tval = t;
 	  sel = 0;
-	  continue;
+	  if( newRadius / distance( tval * ray + origin, rorigin ) < 
+	      1.0 / sqrt( screen.x * screen.y ) )
+	    break;
+	  else
+	    continue;
 	}
       }
     }
     sel = sel + 1;
   }
-  color = unpack( imageLoad( octree, int( node * octreeNodeSize + 1 ) ).x );
-  normal = unpackNormal( imageLoad( octree, int( node * octreeNodeSize ) ).x );
   return tval;
 }
 
