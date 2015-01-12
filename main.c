@@ -47,8 +47,8 @@ GLuint buffers[ 3 ], texs[ 3 ];
  
 
 void quit( void ){
-  glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
-  u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
   
   u32 sz = octree[ 0 ] * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
   
@@ -66,7 +66,7 @@ void quit( void ){
   if( out != NULL )
     gzclose( out );
   
-  glUnmapBuffer( GL_ARRAY_BUFFER );
+  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
 
   exit( EXIT_SUCCESS );
 }
@@ -104,11 +104,11 @@ void keys( const SDL_Event* ev ){
     movingFov = 1;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_o ){
     char msg[ 4097 ];
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
-    u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+    u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
     sprintf( msg, "%u out of %u nodes used", octree[ 0 ], OCTREE_SIZE );
     LNZModalMessage( msg );
-    glUnmapBuffer( GL_ARRAY_BUFFER );
+    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
     if( grow )
       grow = 0;
@@ -356,10 +356,10 @@ int main( int argc, char* argv[] ){
   glGenBuffers( 3, buffers );
 
   for( u32 i = 0; i < 2; ++i ){
-    glBindBuffer( GL_ARRAY_BUFFER, buffers[ i ] );
-    glBufferData( GL_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
 		  NULL, GL_DYNAMIC_COPY );
-    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
   }
 
   
@@ -462,11 +462,11 @@ int main( int argc, char* argv[] ){
     
     // Grow octree maybe.
     if( grow ){
-      glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
-      u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+      u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
       growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
-      glUnmapBuffer( GL_ARRAY_BUFFER );
-      glBindBuffer( GL_ARRAY_BUFFER, 0 );
+      glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
  
     // Model view projection, model view, inverse model view and projection matrices.
@@ -555,8 +555,8 @@ int main( int argc, char* argv[] ){
 
 
 u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
-  glBindBuffer( GL_ARRAY_BUFFER, octreeBuffer );
-  u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, octreeBuffer );
+  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
   u32 actualWireframeSize = 1;
   GLuint wireframeBuffer;
   GLfloat* wireframeData = lmalloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
@@ -617,8 +617,8 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   free( nodes );
   free( cubeCenters );
   free( cubeRadii );
-  glUnmapBuffer( GL_ARRAY_BUFFER );
-  glBindBuffer( GL_ARRAY_BUFFER, 0 );
+  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
   glGenBuffers( 1, &wireframeBuffer );
   glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
