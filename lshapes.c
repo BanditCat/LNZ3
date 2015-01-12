@@ -32,6 +32,7 @@ int mandelbrot( lvec pos, const void* params ){
   lvscale( col, 0.5 );
   lvec add = { 0.5, 0.5, 0.5 };
   lvadd( col, add );
+  lvnormalize( col );
 
   if( sqrt( lvdot( pos, pos ) <= 1.0 ) ){
     float crl = pos[ 0 ] * p->scale + p->center[ 0 ];

@@ -417,7 +417,7 @@ int main( int argc, char* argv[] ){
   glBindBuffer( GL_ARRAY_BUFFER, 0 );
   glBindVertexArray( 0 );
   
-  double time = rand();
+  double time = rand() / (float)RAND_MAX;
   u64 ntime = SDL_GetPerformanceCounter();
   GLuint mvploc = glGetUniformLocation( wprg, "mvp" );
   GLuint rmvloc = glGetUniformLocation( prg, "rmv" );
@@ -442,7 +442,7 @@ int main( int argc, char* argv[] ){
     }
     u64 ttime = ntime;
     ntime = SDL_GetPerformanceCounter();
-    double dtime = ( ntime - ttime ) / (double)SDL_GetPerformanceFrequency();
+    double dtime = (double)( ntime - ttime ) / (double)SDL_GetPerformanceFrequency();
     double udtime = dtime;
     dtime *= (double)scale;
     time += 0.001 * dtime;
@@ -497,7 +497,7 @@ int main( int argc, char* argv[] ){
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
 
     {
-      lvec lght = { 20.0, 80.0, -290.0 };
+      lvec lght = { 20.0, sinf( time * 400.0 ) * 120.0, cosf( time * 400.0 ) * 120.0 };
       glUniform3f( lightloc, lght[ 0 ], lght[ 1 ], lght[ 2 ] );
     }
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 

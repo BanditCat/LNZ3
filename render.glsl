@@ -71,10 +71,10 @@ void main( void ){
       vec3 lray = normalize( rpos - light );
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, dm1, dm2 );
       vec3 lpos = lray * lval + light;
-      if( dot( lpos - rpos, lpos - rpos ) < 10.0 )
-	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 );
+      if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
+	ans = clamp( dot( -lray, norm ).xxx, 0.3, 1.0 ) * col;
       else
-	ans = 0.1.xxx;
+	ans = 0.3 * col;
     }
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
