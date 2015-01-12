@@ -149,7 +149,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 				 node * octreeNodeSize + 2 + ( sel ^ asel ) ).x );
       if( addr == unexplored )
 	break;
-      else if( addr <= 272000 ){
+      else if( addr <= valid ){
 	  
 	vec3 cc;
 	cc.x = unpackFloat( imageLoad( octree, addr * octreeNodeSize + 10 ).x);
