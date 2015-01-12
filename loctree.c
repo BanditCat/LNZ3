@@ -157,10 +157,10 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
 	++sels[ ulvl ];
       while( ulvl < (s32)level ){
 	u32 nn = octree[ nodes[ ulvl ] * OCTREE_NODE_SIZE + 2 + sels[ ulvl ] ];
-	if( nn == UNEXPLORED_CHILD ){
-	  level = ulvl;
-	  break;
-	}
+	/* if( nn == UNEXPLORED_CHILD ){ */
+	/*   level = ulvl; */
+	/*   break; */
+	/* } */
 	if( nn <= VALID_CHILD ){
 	  lvec cc;
 	  lvcopy( cc, cubeVecs[ sels[ ulvl ] ] );
