@@ -53,18 +53,26 @@ void main( void ){
     float x = ( float( index % uint( screen.x ) ) / ( screen.x - 1.0 ) ) * 2.0 - 1.0;
     float y = ( float( index / uint( screen.x ) ) / ( screen.y - 1.0 ) ) * 2.0 - 1.0;
     
-    vec3 ray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
+    vec3 oray = { x * screen.w, y / screen.w, 1 / tan( fov * 0.5 ) };
   
     vec3 cubeCenter = { 0.0, 0.0, 0.0 };
     float cubeRadius = 50.0;
 
     origin = ( vec4( origin, 1.0 ) * rmv ).xyz;
-    ray = normalize( ( vec4( ray, 1.0 ) * rmv ).xyz - origin );
+    vec3 ray = normalize( ( vec4( oray, 1.0 ) * rmv ).xyz - origin );
 
     {
+      vec3 dm1, dm2;
       vec3 col, norm;
       tval = raycastOctree( origin, ray, cubeCenter, cubeRadius, col, norm );
-      ans = clamp( dot( normalize( light ), norm ), 0.3, 1.0 ) * col;
+      vec3 rpos = ray * tval + origin;
+      vec3 lray = normalize( rpos - light );
+      float lval = raycastOctree( light, lray, cubeCenter, cubeRadius, dm1, dm2 );
+      vec3 lpos = lray * lval + light;
+      if( distance( lpos, rpos ) < 20.0 )
+	ans = clamp( dot( lray, norm ), 0.1, 1.0 ) * col;
+      else
+	ans = col * 0.1;
     }
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
@@ -155,7 +163,10 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	  newRadius = r * cubeRadius;
 	  tval = t;
 	  sel = 0;
-	  continue;
+	  if( newRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
+	    break;
+	  else
+	    continue;
 	}
       }
     }
