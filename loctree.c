@@ -223,7 +223,5 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 14 ] = parent;
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 15 ] = child;
 
-  if( cubeRadius >= lunpackRadius( octree[ OCTREE_NODE_SIZE * parent + 13 ] ) )
-    LNZModalMessage( "vff" );
   return octree[ 0 ]++;
 }
