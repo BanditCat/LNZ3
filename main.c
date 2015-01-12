@@ -13,7 +13,7 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 1000000
+#define OCTREE_SIZE 10000000
 #define OCTREE_INITIAL_SIZE 1000
 #define OCTREE_INCREMENTAL_SIZE 5000
 #define WIREFRAME_SIZE 65536
@@ -102,6 +102,13 @@ void keys( const SDL_Event* ev ){
     glViewport( 0, 0, x, y );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_v ){
     movingFov = 1;
+  } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_o ){
+    char msg[ 4097 ];
+    glBindBuffer( GL_ARRAY_BUFFER, buffers[ 2 ] );
+    u32* octree = glMapBuffer( GL_ARRAY_BUFFER, GL_READ_WRITE );
+    sprintf( msg, "%u out of %u nodes used", octree[ 0 ], OCTREE_SIZE );
+    LNZModalMessage( msg );
+    glUnmapBuffer( GL_ARRAY_BUFFER );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
     if( grow )
       grow = 0;
