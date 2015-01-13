@@ -13,6 +13,7 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
+#define OCTREE_WIDTH 16384
 #define OCTREE_SIZE 1000000
 #define OCTREE_INITIAL_SIZE 100//( 262144 - 9 )
 #define OCTREE_INCREMENTAL_SIZE 500
@@ -365,7 +366,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 1.0, 1024 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 10.0, 1024 };
   {
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -384,8 +385,8 @@ int main( int argc, char* argv[] ){
     gzclose( in );
     
     if( octree[ 0 ] == 0 ){
-      initOctree( sphere, octree, &mndlb );
-      growOctree( sphere, octree, &mndlb, OCTREE_INITIAL_SIZE );
+      initOctree( mandelbrot, octree, &mndlb );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
     }
 
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
@@ -435,6 +436,18 @@ int main( int argc, char* argv[] ){
   GLuint lightloc = glGetUniformLocation( prg, "light" );
   int bsel = 0, nbsel = 1;
 
+  GLuint ottex; 
+  glGenTextures( 1, &ottex ); 
+  glBindTexture( GL_TEXTURE_2D, ottex );
+  {
+    
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+    u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY );
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_R32UI, OCTREE_WIDTH, 
+		  OCTREE_SIZE / OCTREE_WIDTH + 1, 0, GL_RED_INTEGER,
+		  GL_UNSIGNED_INT, (void*)octree );
+    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+  }
   while( 1 ){
  
     //Handle 32 events.
@@ -464,7 +477,7 @@ int main( int argc, char* argv[] ){
     if( grow ){
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
       u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
