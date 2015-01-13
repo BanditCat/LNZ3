@@ -69,6 +69,12 @@ void LNZInit( int fullscreen, const char* windowTitle,
     SDL_Log( "Initialized with GL_MAX_TEXTURE_BUFFER_SIZE = %i", max );
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max );
     SDL_Log( "Initialized with GL_MAX_TEXTURE_SIZE = %i", max );
+    if( max < OCTREE_WIDTH ){
+      SDL_LogError( SDL_LOG_CATEGORY_APPLICATION,
+		    "\nInsufficient texture size ( less than %i )\n",
+		    OCTREE_WIDTH );
+      exit( EXIT_FAILURE );
+    }
   }
 }
 

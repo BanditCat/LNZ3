@@ -13,7 +13,6 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_WIDTH 16384
 #define OCTREE_SIZE 1000000
 #define OCTREE_INITIAL_SIZE 100//( 262144 - 9 )
 #define OCTREE_INCREMENTAL_SIZE 500
@@ -366,7 +365,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 10.0, 1024 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 10.0, 128 };
   {
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
