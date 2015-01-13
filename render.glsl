@@ -8,6 +8,7 @@ layout( local_size_x = 1024 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
 layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
+layout( r32ui, binding = 2 ) uniform uimage2D ottex;
 
 // Size of buffer that needs to be cleared.
 uniform uint gcount;
@@ -38,6 +39,7 @@ vec3 loadNormal( int node );
 int loadChild( int node, int sel );
 
 
+const int octreeWidth = 16384;
 const int octreeNodeSize = 16;
 const uint maxCount = 2048;
 const uint unexplored = 4294967295u;
@@ -79,9 +81,9 @@ void main( void ){
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
       if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
-	ans = clamp( dot( -lray, norm ).xxx, 0.4, 1.0 ) * col;
+	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
       else
-	ans = 0.4 * col;
+	ans = 0.1 * col;
     }
     imageStore( gbuffer, int( index ), uvec4( pack( ans ) ) );
   }
@@ -303,7 +305,10 @@ int loadChildSelector( int node ){
   return int( imageLoad( octree, node * octreeNodeSize + 15 ).x );
 }
 int loadParent( int node ){
-  return int( imageLoad( octree, node * octreeNodeSize + 14 ).x );
+  uint addr = node * octreeNodeSize + 14;
+  float addrx = addr % octreeWidth;
+  float addry = addr / octreeWidth;
+  return int( imageLoad( ottex, ivec2( addrx, addry ) ).x );
 }
 vec3 loadColor( int node ){
   return unpack( imageLoad( octree, node * octreeNodeSize + 1 ).x );

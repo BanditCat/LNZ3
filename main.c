@@ -508,6 +508,8 @@ int main( int argc, char* argv[] ){
 			GL_WRITE_ONLY, GL_R32UI );
     glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0,
 			GL_READ_ONLY, GL_R32UI );
+    glBindImageTexture( 2, ottex, 0, GL_FALSE, 0,
+			GL_READ_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
