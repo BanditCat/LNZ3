@@ -30,7 +30,7 @@ float fov = pi / 2.0;
 int wireframe = 0;
 int fullscreen = 0;
 int dwidth, dheight;
-int pixelSize = 4;
+int pixelSize = 6;
 int grow = 0;
 
 // Amortized time.
