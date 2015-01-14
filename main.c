@@ -13,8 +13,8 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 10000000
-#define OCTREE_INITIAL_SIZE 100//( 262144 - 9 )
+#define OCTREE_SIZE 1048576
+#define OCTREE_INITIAL_SIZE 1024//( 262144 - 9 )
 #define OCTREE_INCREMENTAL_SIZE 500
 #define WIREFRAME_SIZE 32768
 
@@ -366,7 +366,8 @@ int main( int argc, char* argv[] ){
   static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 16 };
   {
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
+		  sizeof( u32 ),
 		  NULL, GL_STATIC_DRAW );
     u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
     setOctreeSize( octree, 0 );
@@ -398,7 +399,7 @@ int main( int argc, char* argv[] ){
   glBindTexture( GL_TEXTURE_BUFFER, texs[ 0 ] );
   glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ 0 ] );
   glBindTexture( GL_TEXTURE_BUFFER, texs[ 1 ] );
-  glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ 1 ] );
+  glTexBuffer( GL_TEXTURE_BUFFER, GL_RGBA32UI, buffers[ 1 ] );
   glBindTexture( GL_TEXTURE_BUFFER, 0 );
  
 
@@ -461,7 +462,8 @@ int main( int argc, char* argv[] ){
     if( grow ){
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
       u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
-      growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+      if( OCTREE_INCREMENTAL_SIZE + getOctreeSize( octree ) < OCTREE_SIZE )
+	growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     }
@@ -492,7 +494,7 @@ int main( int argc, char* argv[] ){
     glBindImageTexture( 0, texs[ 0 ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
     glBindImageTexture( 1, texs[ 1 ], 0, GL_FALSE, 0,
-			GL_READ_ONLY, GL_R32UI );
+			GL_READ_ONLY, GL_RGBA32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,

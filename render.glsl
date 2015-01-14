@@ -7,7 +7,7 @@
 layout( local_size_x = 1024 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
-layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
+layout( rgba32ui, binding = 1 ) uniform uimageBuffer octree;
 
 // Size of buffer that needs to be cleared.
 uniform uint gcount;
@@ -292,9 +292,9 @@ float unpackRadius( uint u ){
 
 vec3 loadCubeCenter( int node ){
   vec3 cc;
-  cc.x = unpackFloat( imageLoad( octree, node * octreeNodeSize + 10 ).x);
-  cc.y = unpackFloat( imageLoad( octree, node * octreeNodeSize + 11 ).x);
-  cc.z = unpackFloat( imageLoad( octree, node * octreeNodeSize + 12 ).x);
+  cc.x = unpackFloat( loadNode( node * octreeNodeSize + 10 ) );
+  cc.y = unpackFloat( loadNode( node * octreeNodeSize + 11 ) );
+  cc.z = unpackFloat( loadNode( node * octreeNodeSize + 12 ) );
   return cc;
 }
 float loadRadius( int node ){
@@ -317,6 +317,19 @@ int loadChild( int node, int sel ){
   return loadNode( node * octreeNodeSize + sel + 2 );
 }
 int loadNode( int addr ){  
-  return int( imageLoad( octree, addr ).x );
+  ivec4 ans = ivec4( imageLoad( octree, addr / 4 ) );
+  uint sel = addr % 4;
+  if( sel == 0 )
+    return ans.r;
+  if( sel == 1 )
+    return ans.g;
+  if( sel == 2 )
+    return ans.b;
+  if( sel == 3 )
+    return ans.a;
 }
+
+// int loadNode( int addr ){  
+//   return int( imageLoad( octree, addr ).x );
+// }
 
