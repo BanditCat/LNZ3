@@ -98,8 +98,9 @@ float lunpackRadius( u32 u ){
   return pow( 2.0, 0.0 - (float)u );
 }
 
-void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
+void initOctree( int (*inside)( lvec pos, const void* p ), void* ot,
 		 const void* params ){
+  u32* octree = (u32*)ot;
   octree[ OCTREE_NODE_SIZE * 0 ] = 1;  
   {
     lvec col = { 0.0, 0.0, 0.0 };
@@ -118,8 +119,9 @@ void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
       calculateNode( inside, cc, 0.5, octree, params, 0, i );
   }
 }
-void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
+void growOctree( int (*inside)( lvec pos, const void* p ), void* ot,
 		 const void* params, u32 count ){
+  u32* octree = (u32*)ot;
   u32 level = 0;
   u32 nodes[ MAX_OCTREE_DEPTH ] = { 0 };
   lvec cubeCenters[ MAX_OCTREE_DEPTH ] = { { 0, 0, 0 } };
@@ -177,7 +179,9 @@ void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
   }
 }
 u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
-		   float cubeRadius, u32* octree, const void* params, u32 parent, u32 child ){
+		   float cubeRadius, void* ot, const void* params, u32 parent, 
+		   u32 child ){
+  u32* octree = (u32*)ot;
   lvec col = { 0.0, 0.0, 0.0 };
   lvec normal = { 0.0, 0.0, 0.0 };
   lvec pos = { 0.0, 0.0, 0.0 };
@@ -213,8 +217,8 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   lvnormalize( normal );
   lvscale( col, 1.0 / ( (float)coverage ) );
   
-  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 0 ] = lpackNormal( normal );
-  octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 1 ] = lpackColor( col );
+  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 0, lpackNormal( normal ) );
+  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 1, lpackColor( col ) );
   for( u32 i = 0; i < 8; ++i )
     octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 2 + i ] = UNEXPLORED_CHILD;
   for( u32 i = 0; i < 3; ++i )
@@ -224,4 +228,12 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   octree[ OCTREE_NODE_SIZE * octree[ 0 ] + 15 ] = child;
 
   return octree[ 0 ]++;
+}
+
+void storeOctree( void* octree, u32 addr, u32 value ){
+  u32* ot = (u32*)octree;
+  ot[ addr ] = value;
+}
+u32 getOctreeSize( void* octree ){
+  return ( (u32*)octree )[ 0 ];
 }

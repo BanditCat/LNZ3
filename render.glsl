@@ -317,8 +317,7 @@ vec3 loadNormal( int node ){
 int loadChild( int node, int sel ){
   return loadNode( node * octreeNodeSize + sel + 2 );
 }
-int loadNode( int addr ){
-  
+int loadNode( int addr ){  
   return int( imageLoad( octree, addr ).x );
 }
 

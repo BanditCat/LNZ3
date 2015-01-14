@@ -47,15 +47,16 @@ float lunpackRadius( u32 v );
 
 // The inside function returns 1 if pos is inside, 0 otherwise. It must also set
 // pos to a 0-1 rgb color triplet. The void * is per-shape parameters.
-void initOctree( int (*inside)( lvec pos, const void* p ), u32* octree, 
+void initOctree( int (*inside)( lvec pos, const void* p ), void* octree, 
 		 const void* params );
-void growOctree( int (*inside)( lvec pos, const void* p ), u32* octree,
+void growOctree( int (*inside)( lvec pos, const void* p ), void* octree,
 		 const void* params, u32 count );
 // returns -1--3 or the index of the node created.
 u32 calculateNode( int (*inside)( lvec pos, const void* p ), const lvec cubeCenter, 
-		   float cubeRadius, u32* octree, const void* params,
+		   float cubeRadius, void* octree, const void* params,
 		   u32 parent, u32 child ); 
-
+void storeOctree( void* octree, u32 addr, u32 value );
+u32 getOctreeSize( void* octree );
 
 
 
