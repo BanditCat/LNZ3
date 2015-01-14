@@ -50,7 +50,7 @@ void quit( void ){
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
   u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
   
-  u32 sz = octree[ 0 ] * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
+  u32 sz = getOctreeSize( octree ) * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
   
   gzFile out = gzopen( "octree", "w" );
   int len = 1;
@@ -62,7 +62,7 @@ void quit( void ){
     LNZModalMessage( "Failed to write!" );
   
   SDL_Log( "%u out of %u octree nodes used.",
-	   octree[ 0 ], OCTREE_SIZE );
+	   getOctreeSize( octree ), OCTREE_SIZE );
   if( out != NULL )
     gzclose( out );
   
@@ -106,7 +106,7 @@ void keys( const SDL_Event* ev ){
     char msg[ 4097 ];
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
     u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
-    sprintf( msg, "%u out of %u nodes used", octree[ 0 ], OCTREE_SIZE );
+    sprintf( msg, "%u out of %u nodes used", getOctreeSize( octree ), OCTREE_SIZE );
     LNZModalMessage( msg );
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
@@ -371,7 +371,7 @@ int main( int argc, char* argv[] ){
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_STATIC_DRAW );
     u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
-    octree[ 0 ] = 0;
+    setOctreeSize( octree, 0 );
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
     u8* dst = (u8*)octree;
@@ -383,7 +383,7 @@ int main( int argc, char* argv[] ){
     }
     gzclose( in );
     
-    if( octree[ 0 ] == 0 ){
+    if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
     }
@@ -522,7 +522,7 @@ int main( int argc, char* argv[] ){
 		 pixelSize, aspect );
    
     glBindVertexArray( screenQuadVao );
-    glBindImageTexture( 4, texs[ bsel ], 0, GL_FALSE, 0, 
+    glBindImageTexture( 4, texs[ nbsel ], 0, GL_FALSE, 0, 
 			GL_READ_WRITE, GL_R32UI );
     glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
     glBindVertexArray( 0 );
