@@ -385,7 +385,7 @@ int main( int argc, char* argv[] ){
     
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
-      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree5  ) );
     }
 
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
