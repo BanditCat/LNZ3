@@ -42,12 +42,11 @@ float scale = 1;
 lvec trns = { 0, 0, 90 };
 u64 disableMouseTime = 0;
 
-// 0 and 1 are gbuffers, 2 is the octree.
-GLuint buffers[ 3 ], texs[ 3 ];
- 
+// 0 is the gbuffers, 1 is the octree.
+GLuint buffers[ 2 ], texs[ 2 ];
 
 void quit( void ){
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
   u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
   
   u32 sz = getOctreeSize( octree ) * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
@@ -104,7 +103,7 @@ void keys( const SDL_Event* ev ){
     movingFov = 1;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_o ){
     char msg[ 4097 ];
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
     u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
     sprintf( msg, "%u out of %u nodes used", getOctreeSize( octree ), OCTREE_SIZE );
     LNZModalMessage( msg );
@@ -355,19 +354,18 @@ int main( int argc, char* argv[] ){
 
   glGenBuffers( 3, buffers );
 
-  for( u32 i = 0; i < 2; ++i ){
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
-		  NULL, GL_DYNAMIC_COPY );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-  }
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 0 ] );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
+		NULL, GL_DYNAMIC_COPY );
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+  
 
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
   static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 16 };
   {
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
 		  NULL, GL_STATIC_DRAW );
     u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
@@ -392,12 +390,12 @@ int main( int argc, char* argv[] ){
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
       
     // Build wireframe
-    actualWireframeSize = buildWireframe( &wireframeBuffer, buffers[ 2 ] );
+    actualWireframeSize = buildWireframe( &wireframeBuffer, buffers[ 1 ] );
   }
     
   
-  glGenTextures( 3, texs );
-  for( u32 i = 0; i < 3; ++i ){
+  glGenTextures( 2, texs );
+  for( u32 i = 0; i < 2; ++i ){
     glBindTexture( GL_TEXTURE_BUFFER, texs[ i ] );
     glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ i ] );
     glBindTexture( GL_TEXTURE_BUFFER, 0 );
@@ -433,8 +431,7 @@ int main( int argc, char* argv[] ){
   GLuint gcountloc = glGetUniformLocation( prg, "gcount" );
   GLuint fovloc = glGetUniformLocation( prg, "fov" );
   GLuint lightloc = glGetUniformLocation( prg, "light" );
-  int bsel = 0, nbsel = 1;
-
+ 
   while( 1 ){
  
     //Handle 32 events.
@@ -462,7 +459,7 @@ int main( int argc, char* argv[] ){
     
     // Grow octree maybe.
     if( grow ){
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
       u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
@@ -492,9 +489,9 @@ int main( int argc, char* argv[] ){
 
     // Render to gbuffer.
     glUseProgram( prg );
-    glBindImageTexture( 0, texs[ nbsel ], 0, GL_FALSE, 0,
+    glBindImageTexture( 0, texs[ 0 ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
-    glBindImageTexture( 1, texs[ 2 ], 0, GL_FALSE, 0,
+    glBindImageTexture( 1, texs[ 1 ], 0, GL_FALSE, 0,
 			GL_READ_ONLY, GL_R32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
@@ -522,7 +519,7 @@ int main( int argc, char* argv[] ){
 		 pixelSize, aspect );
    
     glBindVertexArray( screenQuadVao );
-    glBindImageTexture( 4, texs[ nbsel ], 0, GL_FALSE, 0, 
+    glBindImageTexture( 4, texs[ 0 ], 0, GL_FALSE, 0, 
 			GL_READ_WRITE, GL_R32UI );
     glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
     glBindVertexArray( 0 );
@@ -541,13 +538,6 @@ int main( int argc, char* argv[] ){
 
     SDL_GL_SwapWindow( mainWindow );
 
-    if( bsel ){
-      bsel = 0;
-      nbsel = 1;
-    } else{
-      bsel = 1;
-      nbsel = 0;
-    }
   }
   quit();
 }
