@@ -26,7 +26,9 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 			   in float cubeRadius, in vec3 rorigin );
 
 uint pack( in vec3 ans );
-vec3 unpack( in uint v );
+
+int loadNode( int addr );
+
 vec3 unpackNormal( uint v );
 float unpackFloat( uint v );
 float unpackRadius( uint v );
@@ -37,7 +39,6 @@ int loadParent( int node );
 vec3 loadColor( int node );
 vec3 loadNormal( int node );
 int loadChild( int node, int sel );
-
 
 const int octreeWidth = 16384;
 const int octreeNodeSize = 16;
@@ -269,6 +270,8 @@ vec3 unpack( uint ans ){
 }
 
 float unpackFloat( uint u ){
+  if( u == 0 )
+    return 0.0;
   float sign = 1.0;
   if( u >= uint( uint(1) << 31 ) ){
     sign = -1.0;
@@ -305,17 +308,20 @@ int loadChildSelector( int node ){
   return int( imageLoad( octree, node * octreeNodeSize + 15 ).x );
 }
 int loadParent( int node ){
-  uint addr = node * octreeNodeSize + 14;
-  float addrx = addr % octreeWidth;
-  float addry = addr / octreeWidth;
-  return int( imageLoad( ottex, ivec2( addrx, addry ) ).x );
+  int addr = node * octreeNodeSize + 14;
+  return loadNode( addr );
 }
-vec3 loadColor( int node ){
-  return unpack( imageLoad( octree, node * octreeNodeSize + 1 ).x );
+vec3 loadColor( int node ){  
+  return unpack( loadNode( node * octreeNodeSize + 1 ) );
 }
 vec3 loadNormal( int node ){
-  return unpackNormal( imageLoad( octree, node * octreeNodeSize + 0 ).x );
+  return unpackNormal( loadNode( node * octreeNodeSize + 0 ) );
 }
 int loadChild( int node, int sel ){
-  return int( imageLoad( octree, node * octreeNodeSize + sel + 2 ).x );
+  return loadNode( node * octreeNodeSize + sel + 2 );
 }
+int loadNode( int addr ){
+  return int( imageLoad( ottex, ivec2( addr % octreeWidth,
+				       addr / octreeWidth) ).x );
+}
+
