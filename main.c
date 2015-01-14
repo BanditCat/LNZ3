@@ -499,7 +499,7 @@ int main( int argc, char* argv[] ){
 		 pixelSize, aspect );
     glUniform1f( fovloc, fov );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
-
+    glFinish();
     {
       lvec lght = { 120.0, sinf( time * 400.0 ) * 120.0, cosf( time * 400.0 ) * 120.0 };
       lght[ 0 ] *= sinf( time * 777.77 );
