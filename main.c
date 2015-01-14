@@ -365,7 +365,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 10.0, 128 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 10.0, 165 };
   {
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 2 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * OCTREE_NODE_SIZE * sizeof( u32 ),
@@ -385,7 +385,7 @@ int main( int argc, char* argv[] ){
     
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
-      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree5  ) );
+      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
     }
 
     glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
@@ -568,8 +568,8 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   cubeRadii[ 0 ] = 50.0;
     
   for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
-    if( octree[ 2 + i ] <= VALID_CHILD ){
-      nodes[ actualWireframeSize ] = octree[ 2 + i ];
+    if( loadOctree( octree, 2 + i ) <= VALID_CHILD ){
+      nodes[ actualWireframeSize ] = loadOctree( octree, 2 + i );
       lvec cc, ad;
       lvcopy( cc, cubeCenters[ 0 ] );
       lvcopy( ad, cubeVecs[ i ] );
@@ -590,7 +590,7 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
 	   actualWireframeSize < WIREFRAME_SIZE;
 	 --cur ){
       for( u32 i = 0; i < 8 && actualWireframeSize < WIREFRAME_SIZE; ++i ){
-	u32 nn = octree[ nodes[ cur ] * OCTREE_NODE_SIZE + 2 + i ];
+	u32 nn = loadOctree( octree, nodes[ cur ] * OCTREE_NODE_SIZE + 2 + i );
 	if( nn <= VALID_CHILD ){
 	  nodes[ actualWireframeSize ] = nn;
 	  lvec cc, ad;
@@ -607,7 +607,7 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
 
   for( u32 i = 1; i < actualWireframeSize; ++i ){
     lvec ne;
-    lunpackNormal( octree[ nodes[ i ] * OCTREE_NODE_SIZE ], ne );
+    lunpackNormal( loadOctree( octree, nodes[ i ] * OCTREE_NODE_SIZE ), ne );
     lvnormalize( ne );
     lvscale( ne, cubeRadii[ i ] / 1.5 );
     lvadd( ne, cubeCenters[ i ] );

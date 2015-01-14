@@ -55,6 +55,7 @@ void growOctree( int (*inside)( lvec pos, const void* p ), void* octree,
 u32 calculateNode( int (*inside)( lvec pos, const void* p ), const lvec cubeCenter, 
 		   float cubeRadius, void* octree, const void* params,
 		   u32 parent, u32 child ); 
+u32 loadOctree( void* octree, u32 add );
 void storeOctree( void* octree, u32 addr, u32 value );
 u32 getOctreeSize( void* octree );
 void setOctreeSize( void* octree, u32 val );

@@ -101,22 +101,25 @@ float lunpackRadius( u32 u ){
 void initOctree( int (*inside)( lvec pos, const void* p ), void* ot,
 		 const void* params ){
   u32* octree = (u32*)ot;
-  octree[ OCTREE_NODE_SIZE * 0 ] = 1;  
+  setOctreeSize( octree, 1 );  
   {
     lvec col = { 0.0, 0.0, 0.0 };
-    octree[ 1 ] = lpackColor( col );
+    storeOctree( octree, 1, lpackColor( col ) );
   }
-  octree[ 10 ] = octree[ 11 ] = octree[ 12 ] = lpackFloat( 0.0 );
-  octree[ 13 ] = lpackRadius( 1.0 );
-  octree[ 14 ] = 0;
-  octree[ 15 ] = 0;
+  storeOctree( octree, 10, lpackFloat( 0.0 ) );
+  storeOctree( octree, 11, lpackFloat( 0.0 ) );
+  storeOctree( octree, 12, lpackFloat( 0.0 ) );
+  storeOctree( octree, 13, lpackRadius( 1.0 ) );
+  storeOctree( octree, 14, 0 );
+  storeOctree( octree, 15, 0 );
+
   
   for( u32 i = 0; i < 8; ++i ){
     lvec cc;
     lvcopy( cc, cubeVecs[ i ] );
     lvscale( cc, 0.5 );
-    octree[ OCTREE_NODE_SIZE * 0 + 2 + i ] =
-      calculateNode( inside, cc, 0.5, octree, params, 0, i );
+    storeOctree( octree, OCTREE_NODE_SIZE * 0 + 2 + i,
+		 calculateNode( inside, cc, 0.5, octree, params, 0, i ) );
   }
 }
 void growOctree( int (*inside)( lvec pos, const void* p ), void* ot,
@@ -136,14 +139,14 @@ void growOctree( int (*inside)( lvec pos, const void* p ), void* ot,
  
   while( calced < count ){
     for( u32 i = 0; i < 8 && calced < count; ++i ){
-      if( octree[ nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ] == UNEXPLORED_CHILD ){
+      if( loadOctree( octree, nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ) == UNEXPLORED_CHILD ){
 	lvec cc;
 	lvcopy( cc, cubeVecs[ i ] );
 	lvscale( cc, cubeRadii[ level ] * 0.5 );
 	lvadd( cc, cubeCenters[ level ] );
-	u32 nn = octree[ nodes[ level ] * OCTREE_NODE_SIZE + 2 + i ] = 
-	  calculateNode( inside, cc, cubeRadii[ level ] * 0.5, octree, params,
+	u32 nn = calculateNode( inside, cc, cubeRadii[ level ] * 0.5, octree, params,
 			 nodes[ level ], i );
+	storeOctree( octree, nodes[ level ] * OCTREE_NODE_SIZE + 2 + i, nn );
 	if( nn <= VALID_CHILD )
 	  ++calced;
       }
@@ -217,21 +220,26 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   lvnormalize( normal );
   lvscale( col, 1.0 / ( (float)coverage ) );
   
-  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 0, lpackNormal( normal ) );
-  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 1, lpackColor( col ) );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 0, lpackNormal( normal ) );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 1, lpackColor( col ) );
   for( u32 i = 0; i < 8; ++i )
-    storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 2 + i, UNEXPLORED_CHILD );
+    storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 2 + i, UNEXPLORED_CHILD );
   for( u32 i = 0; i < 3; ++i )
-    storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 10 + i, 
+    storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 10 + i, 
 		 lpackFloat( cubeCenter[ i ] ) );
-  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 13, 
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 13, 
 	       lpackRadius( cubeRadius ) ); 
-  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 14, parent );
-  storeOctree( octree, OCTREE_NODE_SIZE * octree[ 0 ] + 15, child );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 14, parent );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 15, child );
 
-  return octree[ 0 ]++;
+  u32 nsz = getOctreeSize( octree );
+  setOctreeSize( octree, nsz + 1 );
+  return nsz;
 }
-
+u32 loadOctree( void* octree, u32 addr ){
+  u32* ot = (u32*)octree;
+  return ot[ addr ];
+}
 void storeOctree( void* octree, u32 addr, u32 value ){
   u32* ot = (u32*)octree;
   ot[ addr ] = value;
