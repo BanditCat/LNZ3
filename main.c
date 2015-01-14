@@ -512,7 +512,7 @@ int main( int argc, char* argv[] ){
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
 		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
 
-    
+    glFinish();
     // Render quad.
     glUseProgram( bprg );
     glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, 
