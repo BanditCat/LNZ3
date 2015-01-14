@@ -352,7 +352,7 @@ int main( int argc, char* argv[] ){
 
   
 
-  glGenBuffers( 3, buffers );
+  glGenBuffers( 2, buffers );
 
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 0 ] );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
