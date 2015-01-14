@@ -22,7 +22,7 @@
 #define VALID_CHILD ( 4294967292u )
 
 // Should be 2^n + 1. 
-#define SUPERSAMPLE_DIM 9
+#define SUPERSAMPLE_DIM 5
 #define SUPERSAMPLES ( SUPERSAMPLE_DIM * SUPERSAMPLE_DIM * SUPERSAMPLE_DIM )
 
 static const lvec cubeVecs[ 8 ] = 
