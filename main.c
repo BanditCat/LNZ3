@@ -7,16 +7,16 @@
 #include <stdio.h>
 #include "math.h"
 
-#define COMPUTE_GROUP_SIZE 256
+#define COMPUTE_GROUP_SIZE 1024
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 1048576
-#define OCTREE_INITIAL_SIZE 10240//( 262144 - 9 )
+#define OCTREE_INITIAL_SIZE 10240
 #define OCTREE_INCREMENTAL_SIZE 4096
-#define WIREFRAME_SIZE 32768
+#define WIREFRAME_SIZE 272000
 
 #define FOV_MINIMUM ( pi * 0.01 )
 #define FOV_MAXIMUM ( pi * 0.99 )
@@ -363,7 +363,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 256 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 8 };
   {
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
@@ -453,7 +453,17 @@ int main( int argc, char* argv[] ){
     time += 0.001 * dtime;
     if( dtime )
       sfps = sfps * 0.95 + 0.05 / dtime;
-    
+    /* { */
+    /*   static u32 ticks = 0; */
+    /*   if( sfps > 90.0 && pixelSize > 1 && ticks > 10 ){ */
+    /* 	ticks = 0; */
+    /* 	--pixelSize; */
+    /*   }else if( sfps < 60.0 && pixelSize < 20 && ticks > 10 ){ */
+    /* 	ticks = 0; */
+    /* 	++pixelSize; */
+    /*   } */
+    /*   ++ticks; */
+    /* } */
 
     rotx += udtime * drotx * 2;
     roty += udtime * droty * 2;
@@ -472,10 +482,10 @@ int main( int argc, char* argv[] ){
     lmat mvp, mv, rmv, proj;    
     float aspect = sqrt( dwidth / (double)dheight );
     {
-      lvec up = { cosf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ), 
-		  cosf( roty * 5 ), 
-		  sinf( rotx * 5 + pi / 2 ) * sinf( roty * 5 ) };
-      lvec right = { cosf( rotx * 5 ), 0.0, sinf( rotx * 5 ) };
+      lvec up = { cosf( -rotx * 5 + pi / 2 ) * sinf( -roty * 5 ), 
+		  cosf( -roty * 5 ), 
+		  sinf( -rotx * 5 + pi / 2 ) * sinf( -roty * 5 ) };
+      lvec right = { cosf( -rotx * 5 ), 0.0, sinf( -rotx * 5 ) };
 
       lmidentity( mv );
       lmbasis( mv, up, right );
@@ -514,7 +524,6 @@ int main( int argc, char* argv[] ){
     glDispatchCompute( ( ( dwidth / pixelSize ) * ( dheight / pixelSize ) ) / 
 		       COMPUTE_GROUP_SIZE + 1, 1, 1 );
 
-    glFinish();
     // Render quad.
     glUseProgram( bprg );
     glUniform4f( bscreenloc, dwidth / pixelSize, dheight / pixelSize, 
