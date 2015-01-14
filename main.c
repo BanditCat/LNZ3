@@ -13,7 +13,7 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 1000000
+#define OCTREE_SIZE 10000000
 #define OCTREE_INITIAL_SIZE 100//( 262144 - 9 )
 #define OCTREE_INCREMENTAL_SIZE 500
 #define WIREFRAME_SIZE 32768
@@ -395,11 +395,11 @@ int main( int argc, char* argv[] ){
     
   
   glGenTextures( 2, texs );
-  for( u32 i = 0; i < 2; ++i ){
-    glBindTexture( GL_TEXTURE_BUFFER, texs[ i ] );
-    glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ i ] );
-    glBindTexture( GL_TEXTURE_BUFFER, 0 );
-  }
+  glBindTexture( GL_TEXTURE_BUFFER, texs[ 0 ] );
+  glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ 0 ] );
+  glBindTexture( GL_TEXTURE_BUFFER, texs[ 1 ] );
+  glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ 1 ] );
+  glBindTexture( GL_TEXTURE_BUFFER, 0 );
  
 
   // Build vertex objects.

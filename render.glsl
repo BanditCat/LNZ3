@@ -8,7 +8,6 @@ layout( local_size_x = 1024 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
 layout( r32ui, binding = 1 ) uniform uimageBuffer octree;
-layout( r32ui, binding = 2 ) uniform uimage2D ottex;
 
 // Size of buffer that needs to be cleared.
 uniform uint gcount;
