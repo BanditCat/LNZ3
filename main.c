@@ -35,14 +35,14 @@ int grow = 0;
 
 // Amortized time.
 float sfps = 30.0;
-float rotx = 0, roty = 0, drotx = 0, droty = 0;
+float rotx = 39, roty = 81, drotx = 0, droty = 0;
 int rel = 0;
 int blowup = 0;
-float scale = 1;
-lvec trns = { 0, 0, 90 };
+float scale = 0;
+lvec trns = { 0, 0, 20 };
 u64 disableMouseTime = 0;
 
-// 0 is the gbuffers, 1 is the octree.
+// 0 is the gbuffer, 1 is the octree.
 GLuint buffers[ 2 ], texs[ 2 ];
 
 void quit( void ){

@@ -1,1 +1,2 @@
-File saves and zlib.
+Optimize code. Shift shape generation to gpu so it can be run time compiled.
+

@@ -135,6 +135,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	tval = 0.0;
 	break;
       }
+      // Go up.
       sel = loadChildSelector( node );
       node = loadParent( node );
       cubeCenter = loadCubeCenter( node );
@@ -162,6 +163,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	float r = loadRadius( addr );
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
+	  // Go down.
 	  node = addr;
 	  cubeCenter = cc;
 	  newRadius = r * cubeRadius;
