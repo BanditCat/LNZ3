@@ -223,18 +223,18 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 
 vec3 unpackNormal( uint ans ){
   vec3 v;
-  v.x = ( ( ans >> 0 ) & 2047 ) / 2047.0;
-  v.y = ( ( ans >> 11 ) & 2047 ) / 2047.0;
-  v.z = ( ( ans >> 22 ) & 1023 ) / 1023.0;
+  v.x = float( ( ans >> 0 ) & 2047 ) / 2047.0;
+  v.y = float( ( ans >> 11 ) & 2047 ) / 2047.0;
+  v.z = float( ( ans >> 22 ) & 1023 ) / 1023.0;
   v = v * 2.0 - 1.0;
   return v;
 }
 
 vec3 unpack( uint ans ){
   vec3 v;
-  v.x = ( ( ans >> 0 ) & 2047 ) / 2047.0;
-  v.y = ( ( ans >> 11 ) & 2047 ) / 2047.0;
-  v.z = ( ( ans >> 22 ) & 1023 ) / 1023.0;
+  v.x = float( ( ans >> 0 ) & 2047 ) / 2047.0;
+  v.y = float( ( ans >> 11 ) & 2047 ) / 2047.0;
+  v.z = float( ( ans >> 22 ) & 1023 ) / 1023.0;
   return v;
 }
 
