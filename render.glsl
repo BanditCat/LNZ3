@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) Jonathan(Jon) DuBois 2014. This file is part of LNZ.         //
-////////////////////////////////////////////////////////////////////////////////
-
 #version 430 core
 
 layout( local_size_x = 1024 ) in;
@@ -9,7 +5,6 @@ layout( local_size_x = 1024 ) in;
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
 layout( rgba32ui, binding = 1 ) uniform uimageBuffer octree;
 
-// Size of buffer that needs to be cleared.
 uniform uint gcount;
 uniform vec4 screen;
 uniform mat4 rmv;
@@ -129,7 +124,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	tval = 0.0;
 	break;
       }
-      // Go up.
+
       sel = loadChildSelector( node );
       node = loadParent( node );
       newRadius *= 2;
@@ -152,7 +147,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	cc = cubeCenter + cubeVecs[ sl ] * r;
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
-	  // Go down.
+
 	  node = addr;
 	  cubeCenter = cc;
 	  newRadius /= 2;
@@ -187,7 +182,6 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	tval = 0.0;
 	break;
       }
-      // Go up.
       sel = loadChildSelector( node );
       node = loadParent( node );
       newRadius *= 2;
@@ -210,14 +204,11 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	cc = cubeCenter + cubeVecs[ sl ] * r;
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
-	  // Go down.
 	  node = addr;
 	  cubeCenter = cc;
 	  newRadius /= 2;
 	  tval = t;
 	  sel = 0;
-	  //	  if( newRadius * cubeRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
-	  // break;
  	  if( newRadius * cubeRadius / distance( tval * ray + origin, rorigin ) < 
  	      1.0 / sqrt( screen.x * screen.y ) )
 	    break;
