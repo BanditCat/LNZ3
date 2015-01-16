@@ -22,10 +22,6 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 uint pack( vec3 ans );
 vec3 unpack( uint v ); 
 vec3 unpackNormal( uint v );
-float unpackFloat( uint v );
-float unpackRadius( uint v );
-vec3 loadCubeCenter( int node );
-float loadRadius( int node );
 int loadChildSelector( int node );
 int loadParent( int node );
 vec3 loadColor( int node );
@@ -238,22 +234,22 @@ vec3 unpack( uint ans ){
   return v;
 }
 
-float unpackFloat( uint u ){
-  if( u == 0 )
-    return 0.0;
-  float sign = 1.0;
-  if( u >= uint( uint(1) << 31 ) ){
-    sign = -1.0;
-    u -= ( uint(1) << 31 );
-  }
-  uint nfn = u & ( ( uint(1) << 23 ) - 1 );
-  nfn += ( 1 << 23 );
-  int ne = int( u >> 23 );
-  ne -= 126;
-  float nnf = nfn / float( uint(1) << 24 );
-  float nr = exp2( ne ) * nnf;
-  return sign * nr;
-}
+// float unpackFloat( uint u ){
+//   if( u == 0 )
+//     return 0.0;
+//   float sign = 1.0;
+//   if( u >= uint( uint(1) << 31 ) ){
+//     sign = -1.0;
+//     u -= ( uint(1) << 31 );
+//   }
+//   uint nfn = u & ( ( uint(1) << 23 ) - 1 );
+//   nfn += ( 1 << 23 );
+//   int ne = int( u >> 23 );
+//   ne -= 126;
+//   float nnf = nfn / float( uint(1) << 24 );
+//   float nr = exp2( ne ) * nnf;
+//   return sign * nr;
+// }
 
 
 
