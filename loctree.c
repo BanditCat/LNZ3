@@ -214,8 +214,8 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 1, lpackColor( col ) );
   for( u32 i = 0; i < 8; ++i )
     storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 2 + i, UNEXPLORED_CHILD );
-  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 14, parent );
-  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 15, child );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 10, parent );
+  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 11, child );
 
   u32 nsz = getOctreeSize( octree );
   setOctreeSize( octree, nsz + 1 );

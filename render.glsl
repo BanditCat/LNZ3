@@ -259,10 +259,10 @@ float unpackFloat( uint u ){
 
 
 int loadChildSelector( int node ){
-  return loadNode( node * octreeNodeSize + 15 );
+  return loadNode( node * octreeNodeSize + 11 );
 }
 int loadParent( int node ){
-  int addr = node * octreeNodeSize + 14;
+  int addr = node * octreeNodeSize + 10;
   return loadNode( addr );
 }
 vec3 loadColor( int node ){  
