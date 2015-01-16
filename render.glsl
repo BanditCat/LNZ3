@@ -30,7 +30,7 @@ int loadChild( int node, int sel );
 int loadNode( int addr );
 
 const int octreeWidth = 16384;
-const int octreeNodeSize = 16;
+const int octreeNodeSize = 12;
 const uint maxCount = 2048;
 const uint unexplored = 4294967295u;
 const uint valid = 4294967292u;
