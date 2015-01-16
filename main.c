@@ -35,7 +35,7 @@ int grow = 0;
 
 // Amortized time.
 float sfps = 30.0;
-float rotx = 39, roty = 81, drotx = 0, droty = 0;
+float rotx = 39, roty = pi / 2, drotx = 0, droty = 0;
 int rel = 0;
 int blowup = 0;
 float scale = 0;
@@ -451,8 +451,8 @@ int main( int argc, char* argv[] ){
     double udtime = dtime;
     dtime *= (double)scale;
     time += 0.001 * dtime;
-    if( dtime )
-      sfps = sfps * 0.95 + 0.05 / dtime;
+    if( udtime )
+      sfps = sfps * 0.95 + 0.05 / udtime;
     /* { */
     /*   static u32 ticks = 0; */
     /*   if( sfps > 90.0 && pixelSize > 1 && ticks > 10 ){ */

@@ -79,7 +79,7 @@ void main( void ){
       vec3 lray = normalize( rpos - light );
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
-      if( distance( lpos, rpos ) < tval / ( 0.7 * sqrt( screen.x * screen.y ) ) )
+      if( distance( lpos, rpos ) -0.25 < tval / ( sqrt( screen.x * screen.y ) ) )
 	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
       else
 	ans = 0.1 * col;
@@ -117,18 +117,12 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   float tval;
   int node = 0;
   int sel = 0;
-  float newRadius = cubeRadius;
+  float newRadius = 1.0;
 
   for( uint i = 0; i < maxCount; ++i ){
 
-    int asel = 0;
-    if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-      asel = asel + 1;
-    if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-      asel = asel + 2;
-    if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-      asel = asel + 4;
-
+    int asel = int( dot( vec3( 1, 2, 4 ), 
+			 clamp( sign( origin - cubeCenter * cubeRadius ), 0, 1 ))); 
 
     if( sel == 8 ){
       if( node == 0 ){
@@ -138,38 +132,33 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
       // Go up.
       sel = loadChildSelector( node );
       node = loadParent( node );
-      cubeCenter = loadCubeCenter( node );
-      newRadius = loadRadius( node );
-      asel = 0;
-      if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-	asel = asel + 1;
-      if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-	asel = asel + 2;
-      if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-	asel = asel + 4;
-	  
-      sel = ( ( sel ^ asel) + 1 );
+      newRadius *= 2;
+      cubeCenter -= cubeVecs[ sel ] * newRadius / 2;
+      
+      asel = int( dot( vec3( 1, 2, 4 ),
+		       clamp( sign( origin - cubeCenter * cubeRadius ), 0, 1 ))); 
+      sel = ( ( sel ^ asel ) + 1 );
       continue;
 
     } else{	    
-
-      int addr = loadChild( node, sel ^ asel );
+      int sl = sel ^ asel;
+      int addr = loadChild( node, sl );
       if( addr == unexplored )
 	break;
       else if( addr <= valid ){
 	  
 	vec3 cc;
-	cc = loadCubeCenter( addr );
-	float r = loadRadius( addr );
+	float r = newRadius / 2;
+	cc = cubeCenter + cubeVecs[ sl ] * r;
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
 	  // Go down.
 	  node = addr;
 	  cubeCenter = cc;
-	  newRadius = r * cubeRadius;
+	  newRadius /= 2;
 	  tval = t;
 	  sel = 0;
-	  if( newRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
+	  if( newRadius * cubeRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
 	    break;
 	  continue;
 	}
@@ -186,61 +175,53 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   float tval;
   int node = 0;
   int sel = 0;
-  float newRadius = cubeRadius;
+  float newRadius = 1.0;
 
   for( uint i = 0; i < maxCount; ++i ){
 
-    int asel = 0;
-    if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-      asel = asel + 1;
-    if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-      asel = asel + 2;
-    if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-      asel = asel + 4;
-
+    int asel = int( dot( vec3( 1, 2, 4 ), 
+			 clamp( sign( origin - cubeCenter * cubeRadius ), 0, 1 ))); 
 
     if( sel == 8 ){
       if( node == 0 ){
 	tval = 0.0;
 	break;
       }
+      // Go up.
       sel = loadChildSelector( node );
       node = loadParent( node );
-      cubeCenter = loadCubeCenter( node );
-      newRadius = loadRadius( node );
-      asel = 0;
-      if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-	asel = asel + 1;
-      if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-	asel = asel + 2;
-      if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-	asel = asel + 4;
-	  
-      sel = ( ( sel ^ asel) + 1 );
+      newRadius *= 2;
+      cubeCenter -= cubeVecs[ sel ] * newRadius / 2;
+      
+      asel = int( dot( vec3( 1, 2, 4 ),
+		       clamp( sign( origin - cubeCenter * cubeRadius ), 0, 1 ))); 
+      sel = ( ( sel ^ asel ) + 1 );
       continue;
 
     } else{	    
-
-      int addr = loadChild( node, sel ^ asel );
+      int sl = sel ^ asel;
+      int addr = loadChild( node, sl );
       if( addr == unexplored )
 	break;
       else if( addr <= valid ){
 	  
 	vec3 cc;
-	cc = loadCubeCenter( addr );
-	float r = loadRadius( addr );
+	float r = newRadius / 2;
+	cc = cubeCenter + cubeVecs[ sl ] * r;
 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
 	if( t > 0.0 ){
+	  // Go down.
 	  node = addr;
 	  cubeCenter = cc;
-	  newRadius = r * cubeRadius;
+	  newRadius /= 2;
 	  tval = t;
 	  sel = 0;
-	  if( newRadius / distance( tval * ray + origin, rorigin ) < 
-	      1.0 / sqrt( screen.x * screen.y ) )
+	  //	  if( newRadius * cubeRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
+	  // break;
+ 	  if( newRadius * cubeRadius / distance( tval * ray + origin, rorigin ) < 
+ 	      1.0 / sqrt( screen.x * screen.y ) )
 	    break;
-	  else
-	    continue;
+	  continue;
 	}
       }
     }
@@ -248,6 +229,74 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   }
   return tval;
 }
+
+// float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
+// 		     in float cubeRadius, in vec3 rorigin ){
+//   float tval;
+//   int node = 0;
+//   int sel = 0;
+//   float newRadius = cubeRadius;
+
+//   for( uint i = 0; i < maxCount; ++i ){
+
+//     int asel = 0;
+//     if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
+//       asel = asel + 1;
+//     if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
+//       asel = asel + 2;
+//     if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
+//       asel = asel + 4;
+
+
+//     if( sel == 8 ){
+//       if( node == 0 ){
+// 	tval = 0.0;
+// 	break;
+//       }
+//       sel = loadChildSelector( node );
+//       node = loadParent( node );
+//       cubeCenter = loadCubeCenter( node );
+//       newRadius = loadRadius( node );
+//       asel = 0;
+//       if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
+// 	asel = asel + 1;
+//       if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
+// 	asel = asel + 2;
+//       if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
+// 	asel = asel + 4;
+	  
+//       sel = ( ( sel ^ asel) + 1 );
+//       continue;
+
+//     } else{	    
+
+//       int addr = loadChild( node, sel ^ asel );
+//       if( addr == unexplored )
+// 	break;
+//       else if( addr <= valid ){
+	  
+// 	vec3 cc;
+// 	cc = loadCubeCenter( addr );
+// 	float r = loadRadius( addr );
+// 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
+// 	if( t > 0.0 ){
+// 	  node = addr;
+// 	  cubeCenter = cc;
+// 	  newRadius = r * cubeRadius;
+// 	  tval = t;
+// 	  sel = 0;
+// 	  if( newRadius / distance( tval * ray + origin, rorigin ) < 
+// 	      1.0 / sqrt( screen.x * screen.y ) )
+// 	    break;
+// 	  else
+// 	    continue;
+// 	}
+//       }
+//     }
+//     sel = sel + 1;
+//   }
+//   return tval;
+// }
 
 
 vec3 unpackNormal( uint ans ){
@@ -320,15 +369,7 @@ int loadChild( int node, int sel ){
 }
 int loadNode( int addr ){  
   ivec4 ans = ivec4( imageLoad( octree, addr / 4 ) );
-  uint sel = addr % 4;
-  if( sel == 0 )
-    return ans.r;
-  if( sel == 1 )
-    return ans.g;
-  if( sel == 2 )
-    return ans.b;
-  if( sel == 3 )
-    return ans.a;
+  return ans[ addr % 4 ];
 }
 
 // int loadNode( int addr ){  
