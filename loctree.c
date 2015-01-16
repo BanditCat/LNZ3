@@ -23,7 +23,7 @@ u32 lpackColor( const lvec v ){
   return val;
 }
 
-void lunpack( u32 ans, lvec v ){
+void lunpackColor( u32 ans, lvec v ){
   v[ 0 ] = ( ( ans >> 0 ) & 2047 ) / 2047.0;
   v[ 1 ] = ( ( ans >> 11 ) & 2047 ) / 2047.0;
   v[ 2 ] = ( ( ans >> 22 ) & 1023 ) / 1023.0;
@@ -55,48 +55,42 @@ void lunpackNormal( u32 ans, lvec v ){
     v[ i ] = v[ i ] * 2.0 - 1.0;
 }
 
-u32 lpackFloat( float v ){
-  if( v == 0.0 )
-    return 0;
-  u32 sgn = 0;
-  if( v < 0.0 ){
-    v = -v;
-    sgn = ( 1 << 31 );
-  }
+/* u32 lpackFloat( float v ){ */
+/*   if( v == 0.0 ) */
+/*     return 0; */
+/*   u32 sgn = 0; */
+/*   if( v < 0.0 ){ */
+/*     v = -v; */
+/*     sgn = ( 1 << 31 ); */
+/*   } */
   
-  int e;
-  float f = frexpf( v, &e );
-  e += 126;
-  u32 ans = f * (float)( 1 << 24 );
+/*   int e; */
+/*   float f = frexpf( v, &e ); */
+/*   e += 126; */
+/*   u32 ans = f * (float)( 1 << 24 ); */
 
-  ans = ans - (1<<23);
-  ans += ( (u32)e << 23 );
-  return sgn + ans;
-}
+/*   ans = ans - (1<<23); */
+/*   ans += ( (u32)e << 23 ); */
+/*   return sgn + ans; */
+/* } */
 
 
-float lunpackFloat( u32 u ){
-  if( u == 0 )
-    return 0.0;
-  float sign = 1.0;
-  if( u >= (u32)( 1 << 31 ) ){
-    sign = -1.0;
-    u -= ( 1 << 31 );
-  }
-  u32 nfn = u & ( ( 1 << 23 ) - 1 );
-  nfn += ( 1 << 23 );
-  int ne = u >> 23;
-  ne -= 126;
-  float nnf = nfn / (float)( 1 << 24 );
-  float nr = pow( 2.0, ne ) * nnf;
-  return sign * nr;
-}
-u32 lpackRadius( float v ){
-  return 0 - log2( v );
-}
-float lunpackRadius( u32 u ){
-  return pow( 2.0, 0.0 - (float)u );
-}
+/* float lunpackFloat( u32 u ){ */
+/*   if( u == 0 ) */
+/*     return 0.0; */
+/*   float sign = 1.0; */
+/*   if( u >= (u32)( 1 << 31 ) ){ */
+/*     sign = -1.0; */
+/*     u -= ( 1 << 31 ); */
+/*   } */
+/*   u32 nfn = u & ( ( 1 << 23 ) - 1 ); */
+/*   nfn += ( 1 << 23 ); */
+/*   int ne = u >> 23; */
+/*   ne -= 126; */
+/*   float nnf = nfn / (float)( 1 << 24 ); */
+/*   float nr = pow( 2.0, ne ) * nnf; */
+/*   return sign * nr; */
+/* } */
 
 void initOctree( int (*inside)( lvec pos, const void* p ), void* ot,
 		 const void* params ){
@@ -106,10 +100,6 @@ void initOctree( int (*inside)( lvec pos, const void* p ), void* ot,
     lvec col = { 0.0, 0.0, 0.0 };
     storeOctree( octree, 1, lpackColor( col ) );
   }
-  storeOctree( octree, 10, lpackFloat( 0.0 ) );
-  storeOctree( octree, 11, lpackFloat( 0.0 ) );
-  storeOctree( octree, 12, lpackFloat( 0.0 ) );
-  storeOctree( octree, 13, lpackRadius( 1.0 ) );
   storeOctree( octree, 14, 0 );
   storeOctree( octree, 15, 0 );
 
@@ -224,11 +214,6 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 1, lpackColor( col ) );
   for( u32 i = 0; i < 8; ++i )
     storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 2 + i, UNEXPLORED_CHILD );
-  for( u32 i = 0; i < 3; ++i )
-    storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 10 + i, 
-		 lpackFloat( cubeCenter[ i ] ) );
-  storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 13, 
-	       lpackRadius( cubeRadius ) ); 
   storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 14, parent );
   storeOctree( octree, OCTREE_NODE_SIZE * getOctreeSize( octree ) + 15, child );
 

@@ -258,21 +258,6 @@ float unpackFloat( uint u ){
 
 
 
-float unpackRadius( uint u ){
-  return exp2( 0.0 - float( u ) );
-}
-
-
-vec3 loadCubeCenter( int node ){
-  vec3 cc;
-  cc.x = unpackFloat( loadNode( node * octreeNodeSize + 10 ) );
-  cc.y = unpackFloat( loadNode( node * octreeNodeSize + 11 ) );
-  cc.z = unpackFloat( loadNode( node * octreeNodeSize + 12 ) );
-  return cc;
-}
-float loadRadius( int node ){
-  return unpackRadius( loadNode( node * octreeNodeSize + 13 ) );
-}
 int loadChildSelector( int node ){
   return loadNode( node * octreeNodeSize + 15 );
 }

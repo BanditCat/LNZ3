@@ -1,2 +1,4 @@
 Optimize code. Shift shape generation to gpu so it can be run time compiled.
-
+fix fov issues with depth
+use normals to fly around
+move to 12 element, six buffer system

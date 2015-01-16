@@ -34,14 +34,9 @@ static const lvec cubeVecs[ 8 ] =
     {  1.0,  1.0,  1.0 } };
 
 u32 lpackColor( const lvec v );
-void lunpack( u32 ans, lvec v );
+void lunpackColor( u32 ans, lvec v );
 u32 lpackNormal( const lvec v );
 void lunpackNormal( u32 ans, lvec v );
-// packs a -1.0 to 1.0 float into a u32.
-u32 lpackFloat( float v );
-float lunpackFloat( u32 v );
-u32 lpackRadius( float v );
-float lunpackRadius( u32 v );
 
 // The inside function returns 1 if pos is inside, 0 otherwise. It must also set
 // pos to a 0-1 rgb color triplet. The void * is per-shape parameters.
