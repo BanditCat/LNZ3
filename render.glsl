@@ -230,75 +230,6 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
   return tval;
 }
 
-// float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
-// 		     in float cubeRadius, in vec3 rorigin ){
-//   float tval;
-//   int node = 0;
-//   int sel = 0;
-//   float newRadius = cubeRadius;
-
-//   for( uint i = 0; i < maxCount; ++i ){
-
-//     int asel = 0;
-//     if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-//       asel = asel + 1;
-//     if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-//       asel = asel + 2;
-//     if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-//       asel = asel + 4;
-
-
-//     if( sel == 8 ){
-//       if( node == 0 ){
-// 	tval = 0.0;
-// 	break;
-//       }
-//       sel = loadChildSelector( node );
-//       node = loadParent( node );
-//       cubeCenter = loadCubeCenter( node );
-//       newRadius = loadRadius( node );
-//       asel = 0;
-//       if( origin.x - cubeCenter.x * cubeRadius > 0.0 )
-// 	asel = asel + 1;
-//       if( origin.y - cubeCenter.y * cubeRadius > 0.0 )
-// 	asel = asel + 2;
-//       if( origin.z - cubeCenter.z * cubeRadius > 0.0 )
-// 	asel = asel + 4;
-	  
-//       sel = ( ( sel ^ asel) + 1 );
-//       continue;
-
-//     } else{	    
-
-//       int addr = loadChild( node, sel ^ asel );
-//       if( addr == unexplored )
-// 	break;
-//       else if( addr <= valid ){
-	  
-// 	vec3 cc;
-// 	cc = loadCubeCenter( addr );
-// 	float r = loadRadius( addr );
-// 	float t = raycastCube( origin, ray, cc * cubeRadius, cubeRadius * r ); 
-// 	if( t > 0.0 ){
-// 	  node = addr;
-// 	  cubeCenter = cc;
-// 	  newRadius = r * cubeRadius;
-// 	  tval = t;
-// 	  sel = 0;
-// 	  if( newRadius / distance( tval * ray + origin, rorigin ) < 
-// 	      1.0 / sqrt( screen.x * screen.y ) )
-// 	    break;
-// 	  else
-// 	    continue;
-// 	}
-//       }
-//     }
-//     sel = sel + 1;
-//   }
-//   return tval;
-// }
-
-
 vec3 unpackNormal( uint ans ){
   vec3 v;
   v.x = ( ( ans >> 0 ) & 2047 ) / 2047.0;
@@ -371,8 +302,4 @@ int loadNode( int addr ){
   ivec4 ans = ivec4( imageLoad( octree, addr / 4 ) );
   return ans[ addr % 4 ];
 }
-
-// int loadNode( int addr ){  
-//   return int( imageLoad( octree, addr ).x );
-// }
 
