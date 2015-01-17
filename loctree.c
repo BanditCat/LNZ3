@@ -174,7 +174,7 @@ void growOctree( int (*inside)( lvec pos, const void* p ), void* ot,
 u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
 		   float cubeRadius, void* ot, const void* params, u32 parent, 
 		   u32 child ){
-  u32* octree = (u32*)ot;
+  void* octree = (u32*)ot;
   lvec col = { 0.0, 0.0, 0.0 };
   lvec normal = { 0.0, 0.0, 0.0 };
   lvec pos = { 0.0, 0.0, 0.0 };
@@ -222,16 +222,16 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
   return nsz;
 }
 u32 loadOctree( void* octree, u32 addr ){
-  u32* ot = (u32*)octree;
-  return ot[ addr ];
+  u32** ot = (u32**)octree;
+  return ot[ 0 ][ addr ];
 }
 void storeOctree( void* octree, u32 addr, u32 value ){
-  u32* ot = (u32*)octree;
-  ot[ addr ] = value;
+  u32** ot = (u32**)octree;
+  ot[ 0 ][ addr ] = value;
 }
 u32 getOctreeSize( void* octree ){
-  return ( (u32*)octree )[ 0 ];
+  return ( (u32**)octree )[ 0 ][ 0 ];
 }
 void setOctreeSize( void* octree, u32 sz ){
-  ( (u32*)octree )[ 0 ] = sz;
+  ( (u32**)octree )[ 0 ][ 0 ] = sz;
 } 

@@ -14,6 +14,7 @@
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 1048576
+#define OCTREE_NUM_BUFFERS 6
 #define OCTREE_INITIAL_SIZE 10240
 #define OCTREE_INCREMENTAL_SIZE 4096
 #define WIREFRAME_SIZE 272000
@@ -23,7 +24,7 @@
 
 u32 buildWireframe( GLuint* buf );
 void* getOctree( void );
-void releaseOctree( void );
+void releaseOctree( u32** );
 void* initOctreeMemory( void );
 
 int movingWindow = 0;
@@ -46,7 +47,7 @@ lvec trns = { 0, 0, 20 };
 u64 disableMouseTime = 0;
 
 // 0 is the gbuffer, 1 is the octree.
-GLuint buffers[ 2 ], texs[ 2 ];
+GLuint buffers[ 1 + OCTREE_NUM_BUFFERS ], texs[ 1 + OCTREE_NUM_BUFFERS ];
 
 void quit( void ){
   void* octree = getOctree();
@@ -71,7 +72,7 @@ void quit( void ){
   if( out != NULL )
     gzclose( out );
   
-  releaseOctree();
+  releaseOctree( octree );
   free( buf );
 
   exit( EXIT_SUCCESS );
@@ -113,7 +114,7 @@ void keys( const SDL_Event* ev ){
     void* octree = getOctree();
     sprintf( msg, "%u out of %u nodes used", getOctreeSize( octree ), OCTREE_SIZE );
     LNZModalMessage( msg );
-    releaseOctree();
+    releaseOctree( octree );
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
     if( grow )
       grow = 0;
@@ -358,7 +359,7 @@ int main( int argc, char* argv[] ){
 
   
 
-  glGenBuffers( 2, buffers );
+  glGenBuffers( 1 + OCTREE_NUM_BUFFERS, buffers );
 
   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 0 ] );
   glBufferData( GL_ELEMENT_ARRAY_BUFFER, GBUFFER_SIZE * sizeof( GLuint ),
@@ -406,18 +407,20 @@ int main( int argc, char* argv[] ){
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
     }
 
-    releaseOctree();
+    releaseOctree( octree );
 
     // Build wireframe
     actualWireframeSize = buildWireframe( &wireframeBuffer );
   }
     
   
-  glGenTextures( 2, texs );
+  glGenTextures( 1 + OCTREE_NUM_BUFFERS, texs );
   glBindTexture( GL_TEXTURE_BUFFER, texs[ 0 ] );
   glTexBuffer( GL_TEXTURE_BUFFER, GL_R32UI, buffers[ 0 ] );
-  glBindTexture( GL_TEXTURE_BUFFER, texs[ 1 ] );
-  glTexBuffer( GL_TEXTURE_BUFFER, GL_RGBA32UI, buffers[ 1 ] );
+  for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i ){
+    glBindTexture( GL_TEXTURE_BUFFER, texs[ i ] );
+    glTexBuffer( GL_TEXTURE_BUFFER, GL_RGBA32UI, buffers[ i ] );
+  }
   glBindTexture( GL_TEXTURE_BUFFER, 0 );
  
 
@@ -491,7 +494,7 @@ int main( int argc, char* argv[] ){
       void* octree = getOctree();
       if( OCTREE_INCREMENTAL_SIZE + getOctreeSize( octree ) < OCTREE_SIZE )
 	growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
-      releaseOctree();
+      releaseOctree( octree );
     }
  
     // Model view projection, model view, inverse model view and projection matrices.
@@ -519,8 +522,9 @@ int main( int argc, char* argv[] ){
     glUseProgram( prg );
     glBindImageTexture( 0, texs[ 0 ], 0, GL_FALSE, 0,
 			GL_WRITE_ONLY, GL_R32UI );
-    glBindImageTexture( 1, texs[ 1 ], 0, GL_FALSE, 0,
-			GL_READ_ONLY, GL_RGBA32UI );
+    for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i )    
+      glBindImageTexture( i, texs[ i ], 0, GL_FALSE, 0,
+			  GL_READ_ONLY, GL_RGBA32UI );
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
@@ -635,7 +639,7 @@ u32 buildWireframe( GLuint* buf ){
   free( cubeCenters );
   free( cubeRadii );
 
-  releaseOctree();
+  releaseOctree( octree );
 
   glGenBuffers( 1, &wireframeBuffer );
   glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
@@ -649,20 +653,30 @@ u32 buildWireframe( GLuint* buf ){
   return actualWireframeSize;
 }
 void* initOctreeMemory( void ){
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
-		sizeof( u32 ),
-		NULL, GL_STATIC_DRAW );
-  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  u32** octree = malloc( sizeof( u32* ) * OCTREE_NUM_BUFFERS );
+  for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i ){
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
+		  sizeof( u32 ),
+		  NULL, GL_STATIC_DRAW );
+    octree[ i - 1 ] = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  }
   return (void*)octree;
 }
 
 void* getOctree( void ){
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  u32** octree = malloc( sizeof( u32* ) * OCTREE_NUM_BUFFERS );
+  for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i ){
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
+    octree[ i - 1 ] = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  }
   return (void*)octree;
 }
 
-void releaseOctree( void ){
-  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+void releaseOctree( u32** octree ){
+  for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i ){
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
+    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+  }
+  free( octree );
 }
