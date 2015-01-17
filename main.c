@@ -14,7 +14,7 @@
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
 #define OCTREE_SIZE 20048000
-#define OCTREE_INITIAL_SIZE 1024
+#define OCTREE_INITIAL_SIZE 102400
 #define OCTREE_INCREMENTAL_SIZE 10000
 #define WIREFRAME_SIZE 272000
 
@@ -369,7 +369,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 1024 };
+  static const sphereParams mndlb = { { 0.0, 0.0, 0.0 }, 0.4 };
   {
     void* octree = initOctreeMemory();
     setOctreeSize( octree, 0 );
@@ -402,8 +402,8 @@ int main( int argc, char* argv[] ){
     free( buf );
 
     if( getOctreeSize( octree ) == 0 ){
-      initOctree( mandelbrot, octree, &mndlb );
-      growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
+      initOctree( sphere, octree, &mndlb );
+      growOctree( sphere, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
     }
 
     releaseOctree( octree );
@@ -492,7 +492,7 @@ int main( int argc, char* argv[] ){
     if( grow ){
       void* octree = getOctree();
       if( OCTREE_INCREMENTAL_SIZE + getOctreeSize( octree ) < OCTREE_SIZE )
-	growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
+	growOctree( sphere, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
       releaseOctree( octree );
     }
  
