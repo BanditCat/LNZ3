@@ -9,6 +9,8 @@
 
 // 16 uints, normal, color, and 8 kids, a cube center and radius, the parent node, and a 0-8 child slector. The normal on node 0 is just the size. 
 
+#define OCTREE_NUM_BUFFERS 6
+
 #define OCTREE_NODE_SIZE ( 12u )
 // Maximum depth of an octree;
 #define MAX_OCTREE_DEPTH ( 256u )

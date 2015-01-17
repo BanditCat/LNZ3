@@ -3,7 +3,12 @@
 layout( local_size_x = 1024 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
-layout( rgba32ui, binding = 1 ) uniform uimageBuffer octree;
+layout( rgba32ui, binding = 1 ) uniform uimageBuffer octree0;
+layout( rgba32ui, binding = 2 ) uniform uimageBuffer octree1;
+layout( rgba32ui, binding = 3 ) uniform uimageBuffer octree2;
+layout( rgba32ui, binding = 4 ) uniform uimageBuffer octree3;
+layout( rgba32ui, binding = 5 ) uniform uimageBuffer octree4;
+layout( rgba32ui, binding = 6 ) uniform uimageBuffer octree5;
 
 uniform uint gcount;
 uniform vec4 screen;
@@ -272,7 +277,16 @@ int loadChild( int node, int sel ){
   return loadNode( node * octreeNodeSize + sel + 2 );
 }
 int loadNode( int addr ){  
-  ivec4 ans = ivec4( imageLoad( octree, addr / 4 ) );
-  return ans[ addr % 4 ];
+  int sel = addr % 6;
+  int raddr = addr / 6;
+  switch( sel ){
+  case 0: return ivec4( imageLoad( octree0, raddr / 4 ) )[ raddr % 4 ];
+  case 1: return ivec4( imageLoad( octree1, raddr / 4 ) )[ raddr % 4 ];
+  case 2: return ivec4( imageLoad( octree2, raddr / 4 ) )[ raddr % 4 ];
+  case 3: return ivec4( imageLoad( octree3, raddr / 4 ) )[ raddr % 4 ];
+  case 4: return ivec4( imageLoad( octree4, raddr / 4 ) )[ raddr % 4 ];
+  case 5: return ivec4( imageLoad( octree5, raddr / 4 ) )[ raddr % 4 ];
+  }
+ 
 }
 

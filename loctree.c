@@ -223,11 +223,11 @@ u32 calculateNode( int (*inside)( lvec, const void* ), const lvec cubeCenter,
 }
 u32 loadOctree( void* octree, u32 addr ){
   u32** ot = (u32**)octree;
-  return ot[ 0 ][ addr ];
+  return ot[ addr % OCTREE_NUM_BUFFERS ][ addr / OCTREE_NUM_BUFFERS ];
 }
 void storeOctree( void* octree, u32 addr, u32 value ){
   u32** ot = (u32**)octree;
-  ot[ 0 ][ addr ] = value;
+  ot[ addr % OCTREE_NUM_BUFFERS ][ addr / OCTREE_NUM_BUFFERS ] = value;
 }
 u32 getOctreeSize( void* octree ){
   return ( (u32**)octree )[ 0 ][ 0 ];
