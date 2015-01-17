@@ -376,15 +376,29 @@ int main( int argc, char* argv[] ){
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
    
-    u8* dst = (u8*)octree;
+
+    u32 bsz = 1024 * 1024;
+    u8* buf = malloc( bsz );
+    u8* dst = buf;
     if( in != NULL ){
       do{
+	while( (int)bsz < ( dst - buf ) + 1024 * 1024 ){
+	  bsz *= 2;
+	  u8* tp = malloc( bsz );
+	  memcpy( tp, dst, bsz / 2 );
+	  free( buf );
+	  buf = tp;
+	}
 	len = gzread( in, dst, 1024 * 1024 );
 	dst += len;
       } while( len );
     }
     gzclose( in );
-    
+
+    u32* wrds = (u32*)buf;
+    for( u32 i = 0; i < wrds[ 0 ] * OCTREE_NODE_SIZE; ++i )
+      storeOctree( octree, i, wrds[ i ] );
+
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
