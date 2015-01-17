@@ -376,24 +376,16 @@ int main( int argc, char* argv[] ){
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
    
-    u32 sz;
-    len = gzread( in, &sz, sizeof( u32 ) );
-    if( len == 4 ){
-      u32* buf = lmalloc( sz * sizeof( u32 ) * OCTREE_NODE_SIZE + 1024 * 1024 + 5 );
-      u32* dst = buf;
-      dst[ 0 ] = sz;
-      ++dst;
-      if( in != NULL ){
-	do{
-	  len = gzread( in, dst, 1024 * 1024 );
-	  dst += len;
-	} while( len && (u32)( dst - buf ) <= sz );
-      }
-      gzclose( in );
-      for( u32 i = 0; i < sz * OCTREE_NODE_SIZE; ++i )
-	storeOctree( octree, i, buf[ i ] );
-      free( buf );
+    
+    u8* dst = (u8*)octree;
+    if( in != NULL ){
+      do{
+	len = gzread( in, dst, 1024 * 1024 );
+	dst += len;
+      } while( len );
     }
+    gzclose( in );
+    
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
