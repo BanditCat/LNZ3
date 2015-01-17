@@ -13,9 +13,9 @@
 #define GBUFFER_HEIGHT ( fullscreenDM.h )
 #define GBUFFER_SIZE ( GBUFFER_HEIGHT * GBUFFER_WIDTH )
 
-#define OCTREE_SIZE 2048
+#define OCTREE_SIZE 20048000
 #define OCTREE_INITIAL_SIZE 1024
-#define OCTREE_INCREMENTAL_SIZE 512
+#define OCTREE_INCREMENTAL_SIZE 10000
 #define WIREFRAME_SIZE 272000
 
 #define FOV_MINIMUM ( pi * 0.01 )
@@ -655,9 +655,8 @@ void* initOctreeMemory( void ){
   u32** octree = malloc( sizeof( u32* ) * OCTREE_NUM_BUFFERS );
   for( u32 i = 1; i < 1 + OCTREE_NUM_BUFFERS; ++i ){
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ i ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
-		  sizeof( u32 ),
-		  NULL, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, OCTREE_SIZE * 2 * 
+		  sizeof( u32 ), NULL, GL_STATIC_DRAW );
     octree[ i - 1 ] = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
   }
   return (void*)octree;
