@@ -51,13 +51,17 @@ void quit( void ){
   void* octree = getOctree();
   
   u32 sz = getOctreeSize( octree ) * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
+  u32* buf = malloc( sz );
+  for( u32 i = 0; i < sz / sizeof( GLuint ); ++i )
+    buf[ i ] = loadOctree( octree, i );
+
   
   gzFile out = gzopen( "octree", "w" );
   int len = 1;
   if( out == NULL )
     LNZModalMessage( "Failed to open file to save!" );
   else
-    len = gzwrite( out, octree, sz );
+    len = gzwrite( out, buf, sz );
   if( len == 0 )
     LNZModalMessage( "Failed to write!" );
   
@@ -67,6 +71,7 @@ void quit( void ){
     gzclose( out );
   
   releaseOctree();
+  free( buf );
 
   exit( EXIT_SUCCESS );
 }
