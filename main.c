@@ -22,6 +22,8 @@
 #define FOV_MAXIMUM ( pi * 0.99 )
 
 u32 buildWireframe( GLuint* buf, GLuint octreeBuffer );
+void* getOctree( void );
+void releaseOctree( void );
 
 int movingWindow = 0;
 int movingFov = 0;
@@ -46,8 +48,7 @@ u64 disableMouseTime = 0;
 GLuint buffers[ 2 ], texs[ 2 ];
 
 void quit( void ){
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  void* octree = getOctree();
   
   u32 sz = getOctreeSize( octree ) * sizeof( GLuint ) * OCTREE_NODE_SIZE ;
   
@@ -65,7 +66,7 @@ void quit( void ){
   if( out != NULL )
     gzclose( out );
   
-  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+  releaseOctree();
 
   exit( EXIT_SUCCESS );
 }
@@ -508,7 +509,7 @@ int main( int argc, char* argv[] ){
     glUniform1ui( gcountloc, ( dwidth / pixelSize ) * ( dheight / pixelSize ) );
       
     glUniform4f( screenloc, dwidth / pixelSize, dheight / pixelSize,
-		 pixelSize, aspect );
+		 1.0 / tan( fov * 0.5 ), aspect );
     glUniform1f( fovloc, fov );
     glUniformMatrix4fv( rmvloc, 1, GL_FALSE, rmv );
     
@@ -631,4 +632,14 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   *buf = wireframeBuffer;
 
   return actualWireframeSize;
+}
+
+void* getOctree( void ){
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
+  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  return (void*)octree;
+}
+
+void releaseOctree( void ){
+  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
 }

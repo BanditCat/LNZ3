@@ -70,7 +70,7 @@ void main( void ){
       vec3 lray = normalize( rpos - light );
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
-      if( distance( lpos, rpos ) -0.25 < tval / ( sqrt( screen.x * screen.y ) ) )
+      if( distance( lpos, rpos ) - 0.5 < tval / ( sqrt( screen.x * screen.y ) ) )
 	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
       else
 	ans = 0.1 * col;
@@ -149,7 +149,7 @@ float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	  newRadius /= 2;
 	  tval = t;
 	  sel = 0;
-	  if( newRadius * cubeRadius / tval < 1.0 / sqrt( screen.x * screen.y ) )
+	  if( newRadius * cubeRadius / tval < 1.0 / ( screen.z * sqrt( screen.x * screen.y ) ) )
 	    break;
 	  continue;
 	}
@@ -206,7 +206,7 @@ float raycastOctreeShadow( in vec3 origin, in vec3 ray, in vec3 cubeCenter,
 	  tval = t;
 	  sel = 0;
  	  if( newRadius * cubeRadius / distance( tval * ray + origin, rorigin ) < 
- 	      1.0 / sqrt( screen.x * screen.y ) )
+ 	      1.0 / ( sqrt( screen.x * screen.y ) * screen.z ) )
 	    break;
 	  continue;
 	}
@@ -250,6 +250,7 @@ vec3 unpack( uint ans ){
 //   float nr = exp2( ne ) * nnf;
 //   return sign * nr;
 // }
+
 
 
 
