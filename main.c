@@ -376,7 +376,6 @@ int main( int argc, char* argv[] ){
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
    
-    
     u8* dst = (u8*)octree;
     if( in != NULL ){
       do{
