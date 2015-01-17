@@ -369,7 +369,7 @@ int main( int argc, char* argv[] ){
   
   GLuint wireframeBuffer;
   u32 actualWireframeSize;
-  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 8 };
+  static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 1024 };
   {
     void* octree = initOctreeMemory();
     setOctreeSize( octree, 0 );
