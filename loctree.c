@@ -152,7 +152,7 @@ void growOctree( int (*inside)( lvec pos, const void* p ), void* ot,
       } else
 	++sels[ ulvl ];
       while( ulvl < (s32)level ){
-	u32 nn = octree[ nodes[ ulvl ] * OCTREE_NODE_SIZE + 2 + sels[ ulvl ] ];
+	u32 nn = loadOctree( octree, nodes[ ulvl ] * OCTREE_NODE_SIZE + 2 + sels[ ulvl ] );
 	if( nn == UNEXPLORED_CHILD ){
 	  level = ulvl;
 	  break;
