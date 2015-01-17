@@ -21,7 +21,7 @@
 #define FOV_MINIMUM ( pi * 0.01 )
 #define FOV_MAXIMUM ( pi * 0.99 )
 
-u32 buildWireframe( GLuint* buf, GLuint octreeBuffer );
+u32 buildWireframe( GLuint* buf );
 void* getOctree( void );
 void releaseOctree( void );
 void* initOctreeMemory( void );
@@ -385,7 +385,8 @@ int main( int argc, char* argv[] ){
 	while( (int)bsz < ( dst - buf ) + 1024 * 1024 ){
 	  bsz *= 2;
 	  u8* tp = malloc( bsz );
-	  memcpy( tp, dst, bsz / 2 );
+	  dst = tp + ( dst - buf );
+	  memcpy( tp, buf, bsz / 2 );
 	  free( buf );
 	  buf = tp;
 	}
@@ -398,6 +399,7 @@ int main( int argc, char* argv[] ){
     u32* wrds = (u32*)buf;
     for( u32 i = 0; i < wrds[ 0 ] * OCTREE_NODE_SIZE; ++i )
       storeOctree( octree, i, wrds[ i ] );
+    free( buf );
 
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
@@ -407,7 +409,7 @@ int main( int argc, char* argv[] ){
     releaseOctree();
 
     // Build wireframe
-    actualWireframeSize = buildWireframe( &wireframeBuffer, buffers[ 1 ] );
+    actualWireframeSize = buildWireframe( &wireframeBuffer );
   }
     
   
@@ -486,12 +488,10 @@ int main( int argc, char* argv[] ){
     
     // Grow octree maybe.
     if( grow ){
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-      u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+      void* octree = getOctree();
       if( OCTREE_INCREMENTAL_SIZE + getOctreeSize( octree ) < OCTREE_SIZE )
 	growOctree( mandelbrot, octree, &mndlb, OCTREE_INCREMENTAL_SIZE );
-      glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+      releaseOctree();
     }
  
     // Model view projection, model view, inverse model view and projection matrices.
@@ -571,9 +571,9 @@ int main( int argc, char* argv[] ){
 
 
 
-u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, octreeBuffer );
-  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+u32 buildWireframe( GLuint* buf ){
+
+  void* octree = getOctree();
   u32 actualWireframeSize = 1;
   GLuint wireframeBuffer;
   GLfloat* wireframeData = lmalloc( WIREFRAME_SIZE * 6 * sizeof( GLfloat ) );
@@ -634,8 +634,8 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   free( nodes );
   free( cubeCenters );
   free( cubeRadii );
-  glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+  releaseOctree();
 
   glGenBuffers( 1, &wireframeBuffer );
   glBindBuffer( GL_ARRAY_BUFFER, wireframeBuffer );
