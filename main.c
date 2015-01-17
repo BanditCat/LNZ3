@@ -24,6 +24,7 @@
 u32 buildWireframe( GLuint* buf, GLuint octreeBuffer );
 void* getOctree( void );
 void releaseOctree( void );
+void* initOctreeMemory( void );
 
 int movingWindow = 0;
 int movingFov = 0;
@@ -109,11 +110,10 @@ void keys( const SDL_Event* ev ){
     movingFov = 1;
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_o ){
     char msg[ 4097 ];
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-    u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+    void* octree = getOctree();
     sprintf( msg, "%u out of %u nodes used", getOctreeSize( octree ), OCTREE_SIZE );
     LNZModalMessage( msg );
-    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
+    releaseOctree();
   } else if( ev->key.state == SDL_PRESSED && ev->key.keysym.sym == SDLK_g ){
     if( grow )
       grow = 0;
@@ -371,31 +371,36 @@ int main( int argc, char* argv[] ){
   u32 actualWireframeSize;
   static const mandelbrotParams mndlb = { { 0.0, 0.0, 0.0 }, 5.0, 8 };
   {
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
-		  sizeof( u32 ),
-		  NULL, GL_STATIC_DRAW );
-    u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+    void* octree = initOctreeMemory();
     setOctreeSize( octree, 0 );
     gzFile in = gzopen( "octree", "r" );
     int len = 0;
-    u8* dst = (u8*)octree;
-    if( in != NULL ){
-      do{
-	len = gzread( in, dst, 1024 * 1024 );
-	dst += len;
-      } while( len );
+   
+    u32 sz;
+    len = gzread( in, &sz, sizeof( u32 ) );
+    if( len == 4 ){
+      u32* buf = lmalloc( sz * sizeof( u32 ) * OCTREE_NODE_SIZE + 1024 * 1024 + 5 );
+      u32* dst = buf;
+      dst[ 0 ] = sz;
+      ++dst;
+      if( in != NULL ){
+	do{
+	  len = gzread( in, dst, 1024 * 1024 );
+	  dst += len;
+	} while( len && (u32)( dst - buf ) <= sz );
+      }
+      gzclose( in );
+      for( u32 i = 0; i < sz * OCTREE_NODE_SIZE; ++i )
+	storeOctree( octree, i, buf[ i ] );
+      free( buf );
     }
-    gzclose( in );
-    
     if( getOctreeSize( octree ) == 0 ){
       initOctree( mandelbrot, octree, &mndlb );
       growOctree( mandelbrot, octree, &mndlb, OCTREE_INITIAL_SIZE - getOctreeSize( octree ) );
     }
 
-    glUnmapBuffer( GL_ELEMENT_ARRAY_BUFFER );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-      
+    releaseOctree();
+
     // Build wireframe
     actualWireframeSize = buildWireframe( &wireframeBuffer, buffers[ 1 ] );
   }
@@ -637,6 +642,14 @@ u32 buildWireframe( GLuint* buf, GLuint octreeBuffer ){
   *buf = wireframeBuffer;
 
   return actualWireframeSize;
+}
+void* initOctreeMemory( void ){
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffers[ 1 ] );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * OCTREE_SIZE * OCTREE_NODE_SIZE * 
+		sizeof( u32 ),
+		NULL, GL_STATIC_DRAW );
+  u32* octree = glMapBuffer( GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE );
+  return (void*)octree;
 }
 
 void* getOctree( void ){
