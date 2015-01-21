@@ -16,7 +16,6 @@ uniform mat4 rmv;
 uniform float fov;
 uniform vec3 light;
 
-
 float raycastCube( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
 		   in float cubeRadius );
 float raycastOctree( in vec3 origin, in vec3 ray, in vec3 cubeCenter, 
@@ -75,7 +74,7 @@ void main( void ){
       vec3 lray = normalize( rpos - light );
       float lval = raycastOctreeShadow( light, lray, cubeCenter, cubeRadius, origin );
       vec3 lpos = lray * lval + light;
-      if( distance( lpos, rpos ) - 0.5 < tval / ( sqrt( screen.x * screen.y ) ) )
+      if( distance( lpos, rpos ) < tval / ( sqrt( screen.x * screen.y ) ) )
 	ans = clamp( dot( -lray, norm ).xxx, 0.1, 1.0 ) * col;
       else
 	ans = 0.1 * col;

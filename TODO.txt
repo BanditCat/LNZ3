@@ -1,3 +1,6 @@
 Optimize code. Shift shape generation to gpu so it can be run time compiled.
 use normals to fly around
-move to 12 element, six buffer system
+ui
+joysticks
+load screens
+y
