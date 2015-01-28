@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "math.h"
 
-#define COMPUTE_GROUP_SIZE 1024
+#define COMPUTE_GROUP_SIZE 128
 
 #define GBUFFER_WIDTH ( fullscreenDM.w )
 #define GBUFFER_HEIGHT ( fullscreenDM.h )

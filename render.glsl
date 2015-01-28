@@ -1,6 +1,6 @@
 #version 430 core
 
-layout( local_size_x = 1024 ) in;
+layout( local_size_x = 128 ) in;
 
 layout( r32ui, binding = 0 ) uniform uimageBuffer gbuffer;
 layout( rgba32ui, binding = 1 ) uniform uimageBuffer octree0;
